@@ -1,0 +1,32 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+
+<td valign="top" class="content">
+
+<div class="main_body">
+	<div class="n_body">
+		<div class="card-body">
+			<div class="account-settings">
+				<div class="user-profile">
+					<div class="user-avatar">
+						<img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Maxwell Admin">
+					</div>
+					<h5 class="user-name">{{user.profile.name}}</h5>
+					<h6 class="user-email">{{user.profile.email_field}}</h6>
+				</div>
+				<div class="inforamation">
+					<p>Вопросы</p>
+					<p>Ответы</p>
+				</div>
+				<hr>
+				<div class="about">
+
+					<p>{{user.profile.bio}}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</td>
+{% endblock %}

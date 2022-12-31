@@ -1,0 +1,21 @@
+{% extends "blog/base.html" %}
+{% block content %}
+<td valign="top" class="content">
+<h1>Вход на сайт</h1>
+    {% if form.errors %}
+        <p>
+            Ваше имя и пароль неправильные
+        </p>
+    {% else %}
+        <p>Пожалуйста, заполните следующие поля:</p>
+    {% endif %}
+    <div class="login-form">
+        <form action="#" method="post">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}"/>
+            <p><input type="submit" value="Войти"></p>
+        </form>
+    </div>
+</td>
+{%endblock%}

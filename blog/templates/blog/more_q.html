@@ -1,0 +1,86 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+
+<td valign="top" class="content">
+
+
+<!--    Так выглядит вопрос(запись)-->
+    <div class="square">
+        <h5 class="category">Категория: {{more_q.q_cat}}</h5>
+        <h1 class="q_name">{{more_q.q_name}}</h1>
+<!--        {% autoescape off %}-->
+        <p class="q_text">{{more_q.q_text}}</p>
+<!--        {% endautoescape %}-->
+    </div>
+
+
+    {% if request.user == more_q.author %}
+    <a href="{% url 'edit' more_q.slug %}">Редактировать</a>
+    <a href="{%url 'delete' more_q.slug %}">удалить</a>
+    {% else %}
+
+    {% endif%}
+
+
+
+
+
+
+
+
+<hr>
+
+<!--Подсчет кол-ва ответов на вопрос-->
+    <h4>
+        Ответы - {{more_q.comments.count}}
+    </h4>
+<!--  форма для заполнения ответов -->
+
+    {% if new_message %}
+    <h3>Ваш ответ был добавлен</h3>
+    {% endif %}
+
+    <h2>Добавьте ваш ответ</h2>
+    {% if user.is_authenticated%}
+    <form action="." method="post">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <p><input type="submit" value="Добавить ответ"></p>
+    </form>
+    {% else %}
+    <h2>Зарегистрируйтесь, чтобы оставить комментарий </h2>
+
+{% endif %}
+    <hr>
+
+{% for i in more_q.comments.all%}
+    <p class="user_name_answer">{{i.author}}</p>
+    <div class="answer">
+        <p class="answer_text">
+        {{ i.text }}
+        </p>
+        {{ i.created|date:"d.m.Y" }}
+    </div>
+    <hr>
+{%endfor%}
+<!--Отображаение всех ответов-->
+
+
+<!--    {% for ans in answer %}-->
+<!--    <p class="user_name_answer">{{user.username}}</p>-->
+<!--    <div class="answer">-->
+<!--        <p class="answer_text">-->
+<!--        {{ ans.text }}-->
+<!--        </p>-->
+<!--        {{ ans.created|date:"d.m.Y" }}-->
+<!--    </div>-->
+<hr>
+    {% empty %}
+        <p>Будьте первым, написавшим ответ!</p>
+    {% endfor %}
+
+
+
+</td>
+
+{% endblock %}

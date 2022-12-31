@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{title}}</title>
+
+	<link type="text/css" href="{% static 'blog/css/styles.css' %}" rel="stylesheet" />
+
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!--	<link rel="shortcut icon" href="#" type=""/>-->
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+
+
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<table class="table-page" border=0 cellpadding="0" cellspacing="0">
+<tr><td valign=top>
+
+
+
+
+		<div class="header">
+			<ul id="mainmenu" class="mainmenu">
+				<li class="last"><a href="{% url 'home' %}">MAMBR</a></li>
+
+
+				{% if user.is_authenticated%}
+
+				<li class="last"><a href="{% url 'log_out' %}">Выход</a> | <a href="#">{{user.username}}</a></li>
+				{%else%}
+					<li class="last"><a href="{% url 'login'%}">Вход</a> | <a href="{% url 'registration'%}">Регистрация</a></li>
+				{% endif %}
+
+
+
+
+
+	</ul>
+
+	</div>
+
+<table class="table-content" border=0 cellpadding="0" cellspacing="0">
+<tr>
+	<td valign="top" class="left-chapters">
+	<ul id="leftchapters">
+<!--		<li class="selected">Все категории</li>-->
+		<li><a href="{% url 'profile'%}">Профиль</a></li>
+		<li><a href="#">Настройки</a></li>
+		<li><a href="{% url 'home' %}">Лента вопросов</a></li>
+
+		<li class="share">
+		<p>Наши соц сети</p>
+		</li>
+	</ul>
+</td>
+
+<script src="{% static 'blog/js/prism.js' %}"></script>
+<!-- Sidebar слева -->
+
+
+<!-- Блок контента -->
+	<div>
+{% block content %}
+{% endblock %}
+
+
+<!-- Конец блока контента -->
+
+
+</tr></table>
+
+</td></tr>
+<!-- Footer -->
+<tr><td>
+	<div id="footer">
+		<p>Сайт разработан - <a class="git_link">https://github.com/KostyaBagr</a></p>
+
+	</div>
+</td></tr></table>
+<!-- Конец footer'а и страницы -->
+</body>
+</html>

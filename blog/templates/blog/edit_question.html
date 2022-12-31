@@ -1,0 +1,56 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+<td valign="top" class="content">
+<h1>Страница редактирования</h1>
+<p><a href="{% url 'home'%}">Вернуться назад</a></p>
+
+{% if status%}
+    <h1>Ваш вопрос успешно обновлен</h1>
+{% endif%}
+<!--    форма для добавления вопроса(поста) на страницу-->
+<form action="" method="post" enctype="multipart/form-data" >
+{% for f in q_form %}
+    <div class="form-error">{{ f.non_field_errors }}</div>
+
+    <p><label for="{{ f.id_form_label }}" >{{f.label}}: </label><p><pre>{{ f }}</pre></p>
+
+<div class="form-error">{{ f.errors }}</div>
+{% endfor %}
+
+
+<!--<form enctype="multipart/form-data" method="post">-->
+<!--   <p><input type="file" name="f">-->
+<!--   <input type="submit" value="Отправить"></p>-->
+<!--  </form>-->
+
+<div id="text_test" >
+<button  type="button" onclick="insert()">Вставить фото</button>
+<button  type="button" onclick="insert(' <code></code> ')">Вставить код</button>
+<button  type="button" onclick="insert(' <h1></h1> ')">Вставить заголовок</button>
+</div>
+<script>
+    function insert (word) {
+  let inp = document.querySelector('#text_test');
+  let start = inp.selectionStart;
+  inp.value = inp.value.substring(0, start) + word +
+    inp.value.substring(inp.selectionEnd, inp.value.length)
+    inp.focus();
+    inp.setSelectionRange(start, start + word.length)
+}
+
+</script>
+
+
+<!--<button  type="button" onclick="insert(' aloha ')">insert aloha</button>-->
+<!--<input value='test'>-->
+
+<!--<input  type="button" onclick="document.getElementById('text_test').innerHTML += html_to_insert;"-->
+<!-- value = "Добавить код" />-->
+
+
+    {% csrf_token %}
+    <p><input type="submit" value="Обновить"></p>
+
+</form>
+</td>
+{%endblock%}

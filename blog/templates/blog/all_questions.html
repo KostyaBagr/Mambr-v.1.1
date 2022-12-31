@@ -1,0 +1,54 @@
+{% extends 'blog/base.html' %}
+{% load blog_tags %}
+
+{% block content %}
+
+<!-- Конец Sidebar'а -->
+<td valign="top" class="content">
+	<!-- Хлебные крошки -->
+
+	<div class="topnav">
+	 <form  action="{% url 'home' %}">
+		 {% if posts %}
+				<input class="srch" type="text" name="search" placeholder="Поиск..">
+		 {% else %}
+		 	<input class="srch2" type="text" name="search" placeholder="Поиск..">
+		 		<h1>По вашему запросу ничего не найдено</h1>
+		 {% endif %}
+			</form>
+    </div>
+
+
+	<button><a class="add_question" href="{% url 'add_q' %}">Добавить вопрос</a></button>
+<div class="categories">
+
+{% show_categories cat_selected=cat_selected %}
+</div>
+{% for i in posts %}
+<div class="main_cards">
+<h1><a  href="{{i.get_absolute_url}}" class="q_name">{{i.q_name}}</a></h1>
+<h3 class="q_category">{{i.q_cat}}</h3>
+<h4>{{i.author}}</h4>
+</div>
+{% endfor %}
+
+{%if page_obj.has_other_pages%}
+<nav class="list-pages">
+	<ul>
+		{%for p in page_obj.paginator.page_range%}
+		{% if page_obj.number == p %}
+        <li class="page-num page-num-selected">{{ p }}</li>
+		{% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2  %}
+        <li class="page-num">
+            <a href="?page={{ p }}">{{ p }}</a>
+        </li>
+		{% endif %}
+		{%endfor%}
+	</ul>
+</nav>
+	{%endif%}
+
+</td>
+
+
+{% endblock %}
