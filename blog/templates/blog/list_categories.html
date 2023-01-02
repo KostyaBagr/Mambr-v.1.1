@@ -1,11 +1,11 @@
 <div class="list_categories">
-<li ><a href="{% url 'home' %}" class="selected" >Все категории</a></li>
+<li ><a href="{% url 'home' %}" class="selected_all" >Все категории</a></li>
+
 {% for c in cats %}
-	{% if c.slug == cat_selected %}
-		<li  class="selected_cat">{{c.name}}</li>
-<!--		<p>Вопросы с категорией {{c.name}}</p>-->
+	{% if c.pk == cat_selected %}
+		<li class="selected">{{c.name}}</li>
 	{% else %}
-		<li><a  href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
+		<li><a href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
 	{% endif %}
 {% endfor %}
 </div>

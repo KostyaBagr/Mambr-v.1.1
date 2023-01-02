@@ -1,27 +1,33 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
 from user_profile.models import *
+
 class LoginForm(AuthenticationForm,forms.ModelForm):
     class Meta:
-        model = User
-        fields = ('username', 'password',)
-    username = forms.CharField()
-    password = forms.CharField(widget=forms.PasswordInput)
+        model = MyUserProfile
+        fields = ('username',)
+    # username = forms.CharField()
+    # password1 = forms.CharField(widget=forms.PasswordInput)
+    # password2 = forms.CharField(widget=forms.PasswordInput)
 
 
-class UserRegistrationForm(forms.ModelForm):
+class CreateUserProfile(UserCreationForm):
     class Meta:
-        model = User
-        fields = ('username', 'password','email')
+        model = MyUserProfile
+        # fields ='__all__'
+        fields =('username', 'email')
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password"])
+        user.set_password(self.cleaned_data["password1"])
+        user.set_password(self.cleaned_data["password2"])
         if commit:
             user.save()
         return user
 
-
-# class UserForm(forms.ModelForm):
-#     model =
+class CustomUserProfile(UserChangeForm):
+    class Meta:
+        model = MyUserProfile
+        # fields ='__all__'
+        fields =('username', 'email', 'bio', 'photo')

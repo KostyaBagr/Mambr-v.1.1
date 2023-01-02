@@ -3,12 +3,12 @@ from django.db import models
 from slugify import slugify
 # Create your models here
 from django.urls import reverse
-
+from user_profile.models import *
 
 
 class Questions(models.Model):
     """Модель для формирования вопросов"""
-    author = models.ForeignKey(User,on_delete=models.CASCADE,verbose_name='Владелец статьи', blank=True, null=True )
+    author = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,verbose_name='Владелец статьи', blank=True, null=True )
     q_name = models.CharField(max_length=255, verbose_name='Вопрос')
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='URL')  # unique= поле уникальное
     q_cat = models.ForeignKey('Category', on_delete=models.PROTECT,
@@ -51,7 +51,7 @@ class Answer(models.Model):
     text = models.TextField(verbose_name='Ответ',default='')
     created = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE,verbose_name='Автор комментария', blank=True, null=True )
+    author = models.ForeignKey(MyUserProfile, on_delete=models.CASCADE,verbose_name='Автор комментария', blank=True, null=True )
 
 
     class Meta:

@@ -11,6 +11,7 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, FormView, DeleteView, UpdateView, FormMixin
 from django.http import HttpResponse, JsonResponse
 # Create your views here.
+
 from .models import *
 from .utils import *
 from django.db.models import Q
@@ -33,9 +34,10 @@ class MainListVIew(DataMixin, ListView):
         # через self обращаемся ко всем методам базового класса DataMixin
         return {**context, **c_def}  # объядиняем словарь
 
-    def get_queryset(self):
+    def get_queryset(self,*, object_list=None, **kwargs):
         q = self.request.GET.get("search", '')
         object_list = Questions.objects.filter(Q(q_name__icontains=q))
+
 
         return object_list
 
@@ -71,7 +73,7 @@ class ShowCategoryView(ListView):
     def get_context_data(self, *, object_list=None,
                          **kwargs):  # формирует динамический и статический контекст, который передается в шаблон
         context = super().get_context_data(**kwargs)  # получаем уже сформированый контекст ListView
-        context['title'] = 'Категория - ' + str(context['posts'][0].q_cat)
+        context['title'] = 'Категория ' + str(context['posts'][0].q_cat)
         context['cat_selected'] = context['posts'][0].q_cat_id
         return context
 
@@ -148,6 +150,7 @@ class UpdateQuestionView(LoginRequiredMixin,SuccessMessageMixin,UpdateView):
         if self.request.user != kwargs['instance'].author:
             return self.handle_no_permission()
         return kwargs
+
 
 
 
