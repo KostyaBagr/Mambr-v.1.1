@@ -26,9 +26,9 @@
 </div>
 {% for i in posts %}
 <div class="main_cards">
+<h3 class="q_category">Категория: {{i.q_cat}}</h3>
 <h1><a  href="{{i.get_absolute_url}}" class="q_name">{{i.q_name}}</a></h1>
-<h3 class="q_category">{{i.q_cat}}</h3>
-<h4>{{i.author}}</h4>
+<h4 class="question_author">Автор вопроса: {{i.author}}</h4>
 </div>
 {% endfor %}
 

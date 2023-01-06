@@ -6,6 +6,7 @@
 
 <!--    Так выглядит вопрос(запись)-->
     <div class="square">
+        <h3>{{more_q.author}}</h3>
         <h5 class="category">Категория: {{more_q.q_cat}}</h5>
         <h1 class="q_name">{{more_q.q_name}}</h1>
 <!--        {% autoescape off %}-->
@@ -15,18 +16,22 @@
 
 
     {% if request.user == more_q.author %}
-    <a href="{% url 'edit' more_q.slug %}">Редактировать</a>
-    <a href="{%url 'delete' more_q.slug %}">удалить</a>
+    <button class="edit_btn"><a class="edit_text" href="{% url 'edit' more_q.slug %}">Редактировать</a></button>
+
+    <form method="post" action="{% url 'delete' more_q.slug %}">{% csrf_token %}
+<!--    <p>Are you sure you want to delete "{{ object }}"?</p>-->
+    {{ delete_form }}
+    <input type="submit" value="Удалить">
+    </form>
     {% else %}
 
     {% endif%}
 
+    <form method="post" action="{% url 'send_msg' more_q.slug%}">{% csrf_token %}
+    {{ telegram_form }}
 
-
-
-
-
-
+    <input type="submit" value="Отпрвавить жалобу">
+    </form>
 
 <hr>
 
@@ -45,6 +50,25 @@
     <form action="." method="post">
         {{ form.as_p }}
         {% csrf_token %}
+
+
+<div id="text_test">
+
+<button  type="button" onclick="insert(' <pre><code>Тут код</code></pre> ')">Вставить код</button>
+
+</div>
+
+<script>
+    function insert (word) {
+  let inp = document.querySelector('#test');
+  let start = inp.selectionStart;
+  inp.value = inp.value.substring(0, start) + word +
+    inp.value.substring(inp.selectionEnd, inp.value.length)
+    inp.focus();
+    inp.setSelectionRange(start, start + word.length)
+}
+
+</script>
         <p><input type="submit" value="Добавить ответ"></p>
     </form>
     {% else %}
@@ -57,12 +81,21 @@
     <p class="user_name_answer">{{i.author}}</p>
     <div class="answer">
         <p class="answer_text">
-        {{ i.text }}
+<!--        {% autoescape off %}-->
+            {{ i.text }}
+            <!--        {% endautoescape %}-->
         </p>
         {{ i.created|date:"d.m.Y" }}
     </div>
+    <form method="post" action="{% url 'ans_delete' more_q.slug %}">{% csrf_token %}
+    <p>Are you sure you want to delete "{{ object }}"?</p>
+    {{ ans_delete_form }}
+    <input type="submit" value="Удалить">
+    </form>
     <hr>
+
 {%endfor%}
+
 <!--Отображаение всех ответов-->
 
 

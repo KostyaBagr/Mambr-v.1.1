@@ -4,7 +4,7 @@ from .models import *
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ('id', 'q_name', 'time_create', 'is_published')
     list_display_links = ('id', 'q_name')
-    search_fields = ('q_name', 'content')
+    search_fields = ('q_name', 'id')
     list_editable = ('is_published',)
     list_filter = ('q_name', 'time_create')
     prepopulated_fields = {'slug': ('q_name',)}

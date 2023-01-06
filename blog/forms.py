@@ -10,6 +10,10 @@ class AnswerForm(forms.ModelForm):
 
         labels = {'text': 'Ваш ответ'}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['text'].widget.attrs.update({'id': 'test'})
+
 
 class QuestionForm(forms.ModelForm):
     class Meta:

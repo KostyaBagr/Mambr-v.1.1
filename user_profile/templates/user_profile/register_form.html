@@ -3,10 +3,12 @@
 <td valign="top" class="content">
   <h1>Создать аккаунт</h1>
     <p>Пожалуйста, заполните следующие поля:</p>
-    <form method="post">
+    <form class="" method="post">
         {{ form.as_p }}
         {% csrf_token %}
         <p><input type="submit" value="Создать аккаунт"></p>
     </form>
+
 </td>
+
 {% endblock %}

@@ -213,6 +213,14 @@
     .list-pages .page-num:hover {
         box-shadow: 3px 3px 1px #d0d0d0;
     }
+    .list-pages .page-num, .page-num-selected {
+        display: inline-block;
+        width: 60px;
+        height: 44px;
+        padding: 16px 0 0 0;
+        border: 1px solid #d0d0d0;
+        border-radius: 30px;
+    }
 
     .square{
         margin-left:8%;
@@ -399,9 +407,20 @@
         height:300px;
     }
 
-
+    .question_author{
+        margin-left:10px;
+    }
     .list_categories{
-        margin-right:-40px;
+        margin-right:-30px;
+        list-style-type: none;
+        margin-left:10%;
+        line-height: 1.7;
+        text-decoration:underline;
+
+    }
+    .edit_text{
+        color:black;
+        text-decoration:none;
     }
 
     .square{
@@ -416,9 +435,13 @@
 
     }
     .answer_text{
-        font-size:25px;
-    }
+        font-size:20px;
 
+    }
+    pre{
+        background-color:#E7F7F9 ;
+        font-size:16px;
+    }
 }
 @media only screen and (max-width:500px) and (max-height:900px){
     .html, body {
@@ -450,6 +473,7 @@
     font-size: 18px;
     }
     .main_cards {
+
     border-radius: 25px;
     background: #D8DCE1;
     margin-top: 10px;
@@ -458,14 +482,68 @@
     justify-content: center;
     align-items: center float:left !important;
     flex-direction: column;
-    height:100px;
+    height:50px;
     }
     .q_name {
-    font-family: 'Oswald', sans-serif;
-    margin-top:200px;
+    font-family: 'Oswald', sans-serif !important;
+    margin-top:100px ;
     }
 
 
+
+    /*регистрация*/
+    .container {
+    padding: 16px;
+    background-color: white;
+}
+
+/* Full-width input fields */
+input[type=text], input[type=password] {
+    width: 100%;
+    padding: 15px;
+    margin: 5px 0 22px 0;
+    display: inline-block;
+    border: none;
+    background: #f1f1f1;
+}
+
+input[type=text]:focus, input[type=password]:focus {
+    background-color: #ddd;
+    outline: none;
+}
+
+/* Overwrite default styles of hr */
+hr {
+    border: 1px solid #f1f1f1;
+    margin-bottom: 25px;
+}
+
+/* Set a style for the submit button */
+.registerbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    opacity: 0.9;
+}
+
+.registerbtn:hover {
+    opacity: 1;
+}
+
+/* Add a blue text color to links */
+a {
+    color: dodgerblue;
+}
+
+/* Set a grey background color and center the text of the "sign in" section */
+.signin {
+    background-color: #f1f1f1;
+    text-align: center;
+}
 }
 
 

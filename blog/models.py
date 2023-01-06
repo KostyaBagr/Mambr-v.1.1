@@ -8,7 +8,7 @@ from user_profile.models import *
 
 class Questions(models.Model):
     """Модель для формирования вопросов"""
-    author = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,verbose_name='Владелец статьи', blank=True, null=True )
+    author = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,verbose_name='Владелец статьи',default='')
     q_name = models.CharField(max_length=255, verbose_name='Вопрос')
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='URL')  # unique= поле уникальное
     q_cat = models.ForeignKey('Category', on_delete=models.PROTECT,
@@ -46,13 +46,15 @@ class Category(models.Model):
         ordering = ['id']
 
 class Answer(models.Model):
-
     post = models.ForeignKey(Questions,on_delete=models.CASCADE, related_name='comments',null=True)
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='URL',default='')
     text = models.TextField(verbose_name='Ответ',default='')
     created = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
-    author = models.ForeignKey(MyUserProfile, on_delete=models.CASCADE,verbose_name='Автор комментария', blank=True, null=True )
+    author = models.ForeignKey(MyUserProfile, on_delete=models.CASCADE,verbose_name='Автор комментария',default='')
 
+    def get_absolute_url(self):
+        return reverse('answer', kwargs={'slug': self.slug})
 
     class Meta:
         verbose_name = 'Ответы'

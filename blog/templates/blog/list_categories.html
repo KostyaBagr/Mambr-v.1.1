@@ -1,3 +1,5 @@
+
+
 <div class="list_categories">
 <li ><a href="{% url 'home' %}" class="selected_all" >Все категории</a></li>
 
@@ -7,5 +9,8 @@
 	{% else %}
 		<li><a href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
 	{% endif %}
+
+{% empty %}
+	<h1>Для данной категории еще нет вопросов(((</h1>
 {% endfor %}
 </div>

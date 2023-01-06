@@ -16,7 +16,13 @@ class CreateUserProfile(UserCreationForm):
     class Meta:
         model = MyUserProfile
         # fields ='__all__'
-        fields =('username', 'email')
+        fields =('username','email')
+        labels= {'username':'Ваше имя'}
+
+        # widgets = {
+        #     'password1': forms.TextInput(attrs={'': 'form-control'}),
+        #
+        # }
 
     def save(self, commit=True):
         user = super().save(commit=False)

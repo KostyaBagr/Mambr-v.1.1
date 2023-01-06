@@ -11,17 +11,18 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, FormView, DeleteView, UpdateView, FormMixin
 from django.http import HttpResponse, JsonResponse
 # Create your views here.
-
+from django.contrib.auth import authenticate
 from .models import *
 from .utils import *
 from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
 from .forms import *
+
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 class MainListVIew(DataMixin, ListView):
-    paginate_by = 7
+    paginate_by = 2
     model = Questions  # выбирает все записи из таблицы и отображает их в виде списка
 
     template_name = 'blog/all_questions.html'
@@ -38,8 +39,7 @@ class MainListVIew(DataMixin, ListView):
         q = self.request.GET.get("search", '')
         object_list = Questions.objects.filter(Q(q_name__icontains=q))
 
-
-        return object_list
+        return super().get_queryset().filter(is_published=True)
 
     # def get_queryset(self):
     #     return Questions.objects.filter(is_published=True)  # возвращвем только опубликованные записиаписи
@@ -83,9 +83,11 @@ class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
     template_name = 'blog/more_q.html'
     slug_url_kwarg = 'q_slug'
     context_object_name = 'more_q'
+
     form_class = AnswerForm
     success_url= reverse_lazy('question')
     success_msg = 'Запись успешно обновлена'
+
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('question', kwargs={'q_slug': self.get_object().slug})
@@ -96,6 +98,7 @@ class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
         return context
 
     def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
         form = self.get_form()
         if form.is_valid():
             # print(self.get_object())
@@ -110,26 +113,41 @@ class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
         self.object.save()
         return super().form_valid(form)
 
+class QuestionDeleteView(LoginRequiredMixin,DeleteView):
+    model = Questions
+    context_object_name = 'delete_form'
+    success_url = reverse_lazy('home')
+    success_msg= 'Все ок'
 
+    def post(self, request, *args, **kwargs):
+        messages.success(self.request,self.success_msg)
+        return super().post(request)
 
-# class DeleteQuestionView(DeleteView):
-#     model = Questions
-#     context_object_name = 'more_q'
-#     template_name = 'blog/more_q.html'
-#     success_url = reverse_lazy('home')
-#     success_msg = 'Запись удалена'
-#
-#     def post(self, request, *args, **kwargs):
-#         messages.success(self.request, self.success_msg)
-#         return super().post(request)
-@login_required
-def delete_q(request, slug):
-    post_to_delete = Questions.objects.get(slug=slug)
-    post_to_delete.delete()
-    # print(request.user)
-    return HttpResponse('Запись успешно удалена')
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.request.user != self.object.author:
+            return self.handle_no_permission()
+        success_url = self.get_success_url()
+        self.object.delete()
+        return HttpResponseRedirect(success_url)
 
+class AnswerDeleteView(LoginRequiredMixin,DeleteView):
+    model = Answer
+    context_object_name = 'ans_delete_form'
+    success_url = reverse_lazy('home')
+    success_msg= 'Все ок'
 
+    def post(self, request, *args, **kwargs):
+        messages.success(self.request,self.success_msg)
+        return super().post(request)
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.request.user != self.object.author:
+            return self.handle_no_permission()
+        success_url = self.get_success_url()
+        self.object.delete()
+        return HttpResponseRedirect(success_url)
 
 class UpdateQuestionView(LoginRequiredMixin,SuccessMessageMixin,UpdateView):
     model = Questions
@@ -146,7 +164,6 @@ class UpdateQuestionView(LoginRequiredMixin,SuccessMessageMixin,UpdateView):
     def get_form_kwargs(self):
         """Return the keyword arguments for instantiating the form."""
         kwargs = super().get_form_kwargs()
-
         if self.request.user != kwargs['instance'].author:
             return self.handle_no_permission()
         return kwargs
