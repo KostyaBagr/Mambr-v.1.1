@@ -1,0 +1,45 @@
+{% extends 'blog/base.html' %}
+{%load static%}
+
+{%block content%}
+<td valign="top" class="content">
+
+<div class="main_body">
+	<div class="n_body">
+		<div class="card-body">
+			<div class="account-settings">
+				<div class="user-profile">
+					<div class="user-avatar">
+
+
+				{% if show_user.photo %}
+								<div class="card-header py-3">
+									<img class='img-thumbnail' src="{{show_user.photo.url}}" alt="1" width="350px" height="500px">
+								</div>
+				{%else%}
+						<div class="card-header py-3">
+									<img class='img-thumbnail' src="{% static 'blog/img/regular_user.jpg'%}" alt="1" width="350px" height="500px">
+								</div>
+				{%endif%}
+
+					</div>
+					<h5 class="user-name">{{show_user.username}}</h5>
+					<h6 class="user-email">{{show_user.email}}</h6>
+				</div>
+				<div class="inforamation">
+					<p>Вопросы</p>
+					<p>Ответы</p>
+					{{show_user.answer.count}}
+				</div>
+				<hr>
+				<div class="about">
+
+					<p>{{show_user.bio}}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</td>
+{%endblock%}
+

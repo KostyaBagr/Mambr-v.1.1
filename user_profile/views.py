@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
@@ -15,7 +15,7 @@ from user_profile.forms import *
 # Create your views here.
 from user_profile.models import *
 from django.contrib.auth.views import LogoutView
-
+from user_profile.decorators import  allowed_users
 
 def success_login(request):
     dict = {
@@ -35,21 +35,6 @@ class SuccessMessageMixin:
         return super().form_valid(form)
 
 
-# @login_required
-# def edit(request):
-#     if request.method == 'POST':
-#         user_form = UserEditForm(instance=request.user, data=request.POST)
-#         profile_form = ProfileEditForm(instance=request.user.profile, data=request.POST, files=request.FILES)
-#         if user_form.is_valid() and profile_form.is_valid():
-#             user_form.save()
-#             profile_form.save()
-#     else:
-#         user_form = UserEditForm(instance=request.user)
-#         profile_form = ProfileEditForm(instance=request.user.profile)
-#         return render(request,
-#                       'user_profile/edit.html',
-#                       {'user_form': user_form,
-#                        'profile_form': profile_form})
 class MyLoginView(LoginView):
     template_name = 'user_profile/login.html'
     form_class = LoginForm
@@ -57,6 +42,8 @@ class MyLoginView(LoginView):
 
     def get_success_url(self):
         return self.success_url
+
+
 
 
 class SignUpView(CreateView):
@@ -72,60 +59,61 @@ class SignUpView(CreateView):
             user.save()
             return self.form_valid(form)
         else:
-            return self.form_invalid(form)
+            return HttpResponse("Уберите пробел")
 
     def form_valid(self, form):
         form_valid = super().form_valid(form)
-
         username = form.cleaned_data["username"]
         email = form.cleaned_data['email']
         password = self.request.POST['password1']
         # password2 = form.cleaned_data['password2']
-        aut_user = authenticate( username=username,password=password, email=email)
+        aut_user = authenticate(username=username,password=password, email=email)
         login(self.request, aut_user)
         return form_valid
 
 
 
-# class ProfileUpdateView(LoginRequiredMixin,UpdateView):
-#     model = MyUserProfile
-#     template_name = 'user_profile/edit.html'
-#     form_class = CreateUserProfile
-#     success_url = reverse_lazy('home')
-#     context_object_name = 'form'
-#     success_msg = 'Запись успешно обновлена'
-#
-#     def get_context_data(self, **kwargs):
-#         kwargs['update_button'] = True
-#         return super().get_context_data(**kwargs)
-#
-#     def get_form_kwargs(self):
-#         """Return the keyword arguments for instantiating the form."""
-#         kwargs = super().get_form_kwargs()
-#         return kwargs
-# class MyRegistrationView(CreateView):
-#     model = MyUserProfile
-#     template_name = 'user_profile/register_form.html'
-#     form_class =  CreateUserProfile
-#     success_msg ='Регистриция прошла успешно'
-#     success_url = reverse_lazy('home')
-#
-#     def form_valid(self, form):
-#         form_valid = super().form_valid(form)
-#         name = form.cleaned_data["name"]
-#         password = form.cleaned_data["password"]
-#         email = form.cleaned_data['email']
-#         aut_user = authenticate(name=name, password=password,email=email)
-#         login(self.request, aut_user)
-#         return form_valid
+def update_profile(request):
+    user = request.user
+    form = CustomUserProfile(instance=user)
+    if request.method == 'POST':
+
+        form = CustomUserProfile(request.POST,request.FILES, instance=user)
+        form.save()
+        return redirect('profile')
 
 
-#
-def get_profile(request):
+
     dict = {
-        'title': 'Ваш профиль'
+        'form':form
     }
-    return render(request, 'user_profile/user_page.html', dict)
+    return render(request, 'user_profile/user_settings.html', dict)
+
+
+def show_other_profiles(request, profile_pk):
+    get_profile = MyUserProfile.objects.get(pk=profile_pk)
+
+    dict={
+        'show_user':get_profile
+    }
+    return render(request,'user_profile/show_user.html', dict)
+
+
+class ProfilePage(ListView):
+    template_name = 'user_profile/user_page.html'
+    model = MyUserProfile
+    pk_url_kwarg = 'profile_pk'
+    context_object_name = 'get_user'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated == True:
+            if request.method.lower() in self.http_method_names:
+                handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
+            else:
+                handler = self.http_method_not_allowed
+            return handler(request, *args, **kwargs)
+        else:
+            return redirect("login")
 
 
 

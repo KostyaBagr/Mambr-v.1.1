@@ -12,12 +12,12 @@ from django.views.generic import ListView
 #     context_object_name = 'telegram_form'
 
 
-def send_tg(request,slug):
+def send_tg(request,q_pk):
         if request.method == "POST":
                 get_path = request.path_info[10:]
                 link = 'http://127.0.0.1:8000/question/'+ get_path
                 # print(link)
-                question_name = get_object_or_404(Questions, slug=slug)
+                question_name = get_object_or_404(Questions, pk=q_pk)
                 sendTg(question_name,link)
                 dict = {
                         'question_name' : question_name

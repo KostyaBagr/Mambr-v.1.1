@@ -9,24 +9,37 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, FormView, DeleteView, UpdateView, FormMixin
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
 # Create your views here.
 from django.contrib.auth import authenticate
+from taggit.views import TagListMixin
+
+from user_profile.forms import CustomUserProfile
 from .models import *
+from taggit.models import Tag
 from .utils import *
-from django.db.models import Q
+from django.db.models import Q, F
 from django.http import Http404, HttpResponseRedirect
 from .forms import *
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
-class MainListVIew(DataMixin, ListView):
-    paginate_by = 2
-    model = Questions  # выбирает все записи из таблицы и отображает их в виде списка
+class TagMixin(object):
 
+    def get_context_data(self, **kwargs):
+        context = super(TagMixin, self).get_context_data(**kwargs)
+        context['tags'] = Tag.objects.all()
+        return context
+
+
+class MainListVIew(TagMixin, DataMixin, ListView):
+    paginate_by = 7
+    model = Questions  # выбирает все записи из таблицы и отображает их в виде списка
     template_name = 'blog/all_questions.html'
     context_object_name = 'posts'
+
+
 
     def get_context_data(self, *, object_list=None,
                          **kwargs):  # формирует динамический и статический контекст, который передается в шаблон
@@ -35,14 +48,21 @@ class MainListVIew(DataMixin, ListView):
         # через self обращаемся ко всем методам базового класса DataMixin
         return {**context, **c_def}  # объядиняем словарь
 
-    def get_queryset(self,*, object_list=None, **kwargs):
+    def get_queryset(self, *, object_list=None, **kwargs):
         q = self.request.GET.get("search", '')
+
         object_list = Questions.objects.filter(Q(q_name__icontains=q))
+        return object_list.filter(is_published=True).order_by('-time_create')
 
-        return super().get_queryset().filter(is_published=True)
 
-    # def get_queryset(self):
-    #     return Questions.objects.filter(is_published=True)  # возвращвем только опубликованные записиаписи
+class TagListView(TagMixin, ListView):
+    paginate_by = 7
+    model = Questions  # выбирает все записи из таблицы и отображает их в виде списка
+    template_name = 'blog/all_questions.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        return Questions.objects.filter(tags__slug=self.kwargs.get('slug'))
 
 
 class SuccessMessageMixin:
@@ -57,40 +77,22 @@ class SuccessMessageMixin:
     # def get_success_url(self):
     #     return reverse  (self.success_url, self.object.slug)
     def get_success_url(self):
-        return '%s?slug=%s' % (self.success_url, self.object.slug)
+        return '%s?id=%s' % (self.success_url, self.object.slug)
 
-
-class ShowCategoryView(ListView):
-    paginate_by = 7
-    model = Questions  # выбирает все записи из таблицы и отображает их в виде списка
-    template_name = 'blog/all_questions.html'
-    context_object_name = 'posts'
-    allow_empty = False
-
-    def get_queryset(self):
-        return Questions.objects.filter(q_cat__slug=self.kwargs['cat_slug'])
-
-    def get_context_data(self, *, object_list=None,
-                         **kwargs):  # формирует динамический и статический контекст, который передается в шаблон
-        context = super().get_context_data(**kwargs)  # получаем уже сформированый контекст ListView
-        context['title'] = 'Категория ' + str(context['posts'][0].q_cat)
-        context['cat_selected'] = context['posts'][0].q_cat_id
-        return context
 
 
 class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
     model = Questions
     template_name = 'blog/more_q.html'
-    slug_url_kwarg = 'q_slug'
+    pk_url_kwarg = 'q_pk'
     context_object_name = 'more_q'
-
     form_class = AnswerForm
-    success_url= reverse_lazy('question')
+    success_url = reverse_lazy('question')
     success_msg = 'Запись успешно обновлена'
 
 
-    def get_success_url(self, **kwargs):
-        return reverse_lazy('question', kwargs={'q_slug': self.get_object().slug})
+    def get_success_url(self):
+        return reverse_lazy('question', kwargs={'q_pk':self.get_object().id})
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -101,7 +103,6 @@ class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
         self.object = self.get_object()
         form = self.get_form()
         if form.is_valid():
-            # print(self.get_object())
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -113,14 +114,16 @@ class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
         self.object.save()
         return super().form_valid(form)
 
-class QuestionDeleteView(LoginRequiredMixin,DeleteView):
+
+
+class QuestionDeleteView(LoginRequiredMixin, DeleteView):
     model = Questions
     context_object_name = 'delete_form'
     success_url = reverse_lazy('home')
-    success_msg= 'Все ок'
+    success_msg = 'Все ок'
 
     def post(self, request, *args, **kwargs):
-        messages.success(self.request,self.success_msg)
+        messages.success(self.request, self.success_msg)
         return super().post(request)
 
     def dispatch(self, request, *args, **kwargs):
@@ -131,14 +134,17 @@ class QuestionDeleteView(LoginRequiredMixin,DeleteView):
         self.object.delete()
         return HttpResponseRedirect(success_url)
 
-class AnswerDeleteView(LoginRequiredMixin,DeleteView):
+def pageNotFound(request, exception):
+    return HttpResponseNotFound('<h1>Страница не найдена</h1>')
+
+class AnswerDeleteView(LoginRequiredMixin, DeleteView):
     model = Answer
     context_object_name = 'ans_delete_form'
     success_url = reverse_lazy('home')
-    success_msg= 'Все ок'
+    success_msg = 'Все ок'
 
     def post(self, request, *args, **kwargs):
-        messages.success(self.request,self.success_msg)
+        messages.success(self.request, self.success_msg)
         return super().post(request)
 
     def dispatch(self, request, *args, **kwargs):
@@ -149,7 +155,8 @@ class AnswerDeleteView(LoginRequiredMixin,DeleteView):
         self.object.delete()
         return HttpResponseRedirect(success_url)
 
-class UpdateQuestionView(LoginRequiredMixin,SuccessMessageMixin,UpdateView):
+
+class UpdateQuestionView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Questions
     template_name = 'blog/add_question.html'
     form_class = QuestionForm
@@ -170,7 +177,6 @@ class UpdateQuestionView(LoginRequiredMixin,SuccessMessageMixin,UpdateView):
 
 
 
-
 class AddQuestion(SuccessMessageMixin, CreateView):
     model = Questions
     template_name = 'blog/add_question.html'
@@ -180,10 +186,7 @@ class AddQuestion(SuccessMessageMixin, CreateView):
     context_object_name = 'form'
 
     def form_valid(self, form):
-        self.object = form.save(commit=False)#создаем экземпляр
-        self.object.author = self.request.user# получаем текущего user
-        self.object.save()# сохраняем в бд
+        self.object = form.save(commit=False)  # создаем экземпляр
+        self.object.author = self.request.user  # получаем текущего user
+        self.object.save()  # сохраняем в бд
         return super().form_valid(form)
-
-
-

@@ -14,6 +14,9 @@ class MyUserProfile(AbstractUser):
     def __str__(self):
         return self.username
 
+    def get_absolute_url(self):
+        return reverse('profile', kwargs={'profile_pk': self.pk})
+
 
 
 

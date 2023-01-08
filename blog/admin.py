@@ -9,11 +9,11 @@ class QuestionAdmin(admin.ModelAdmin):
     list_filter = ('q_name', 'time_create')
     prepopulated_fields = {'slug': ('q_name',)}
 
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name')
-    list_display_links = ('id', 'name')
-    search_fields = ('name',)
-    prepopulated_fields = {'slug': ('name',)}
+# class CategoryAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'name')
+#     list_display_links = ('id', 'name')
+#     search_fields = ('name',)
+#     prepopulated_fields = {'slug': ('name',)}
 
 class AnswerAdmin(admin.ModelAdmin):
     list_display = ( 'post', 'created')
@@ -24,4 +24,4 @@ admin.site.register(Answer, AnswerAdmin)
 
 
 admin.site.register(Questions,QuestionAdmin)
-admin.site.register(Category,CategoryAdmin)
+# admin.site.register(Category,CategoryAdmin)

@@ -19,6 +19,7 @@ class CreateUserProfile(UserCreationForm):
         fields =('username','email')
         labels= {'username':'Ваше имя'}
 
+
         # widgets = {
         #     'password1': forms.TextInput(attrs={'': 'form-control'}),
         #
@@ -35,5 +36,5 @@ class CreateUserProfile(UserCreationForm):
 class CustomUserProfile(UserChangeForm):
     class Meta:
         model = MyUserProfile
-        # fields ='__all__'
         fields =('username', 'email', 'bio', 'photo')
+        exclude = ['password']

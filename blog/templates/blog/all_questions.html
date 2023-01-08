@@ -1,5 +1,5 @@
 {% extends 'blog/base.html' %}
-{% load blog_tags %}
+
 
 {% block content %}
 
@@ -20,17 +20,23 @@
 
 
 	<button><a class="add_question" href="{% url 'add_q' %}">Добавить вопрос</a></button>
-<div class="categories">
 
-{% show_categories cat_selected=cat_selected %}
-</div>
+
+
 {% for i in posts %}
 <div class="main_cards">
-<h3 class="q_category">Категория: {{i.q_cat}}</h3>
+{% for tag in i.tags.all %}
+        <a href="{% url 'taggit' tag.slug %}">
+            {{ tag.name }}
+        </a>
+        {% if not forloop.last %}, {% endif %}
+    {% endfor %}
 <h1><a  href="{{i.get_absolute_url}}" class="q_name">{{i.q_name}}</a></h1>
 <h4 class="question_author">Автор вопроса: {{i.author}}</h4>
 </div>
 {% endfor %}
+
+
 
 {%if page_obj.has_other_pages%}
 <nav class="list-pages">

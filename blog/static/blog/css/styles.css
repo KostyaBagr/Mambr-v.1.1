@@ -432,6 +432,9 @@
         font_weight:bold;
         margin-bottom:-10px;
         font-size:20px;
+        position:relative;
+        margin-left:60px;
+
 
     }
     .answer_text{
@@ -442,6 +445,107 @@
         background-color:#E7F7F9 ;
         font-size:16px;
     }
+
+    /* login */
+
+    .user_card {
+			width: 350px;
+			margin-top: auto;
+			margin-bottom: auto;
+			background: #74cfbf;
+			position: relative;
+			display: flex;
+			justify-content: center;
+			flex-direction: column;
+			padding: 10px;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			border-radius: 5px;
+
+		}
+
+		.form_container {
+			margin-top: 20px;
+		}
+
+		#form-title{
+			color: #fff;
+
+		}
+
+        .author_photo{
+            position:relative;
+        }
+
+		.login_btn {
+			width: 100%;
+			background: #33ccff !important;
+			color: white !important;
+		}
+		.login_btn:focus {
+			box-shadow: none !important;
+			outline: 0px !important;
+		}
+		.login_container {
+			padding: 0 2rem;
+		}
+		.input-group-text {
+			background: #f7ba5b !important;
+			color: white !important;
+			border: 0 !important;
+			border-radius: 0.25rem 0 0 0.25rem !important;
+		}
+		.input_user,
+		.input_pass:focus {
+			box-shadow: none !important;
+			outline: 0px !important;
+		}
+		/* comments*/
+            @media (min-width: 0) {
+        .g-mr-15 {
+            margin-right: 1.07143rem !important;
+        }
+        }
+        @media (min-width: 0){
+        .g-mt-3 {
+            margin-top: 0.21429rem !important;
+        }
+        }
+
+        .g-height-50 {
+        height: 50px;
+        }
+
+        .g-width-50 {
+        width: 50px !important;
+        }
+
+        @media (min-width: 0){
+        .g-pa-30 {
+            padding: 2.14286rem !important;
+        }
+        }
+
+        .g-bg-secondary {
+        background-color: #fafafa !important;
+        }
+
+        .u-shadow-v18 {
+        box-shadow: 0 5px 10px -6px rgba(0, 0, 0, 0.15);
+        }
+
+        .g-color-gray-dark-v4 {
+        color: #777 !important;
+        }
+
+        .g-font-size-12 {
+        font-size: 0.85714rem !important;
+        }
+
+        .media-comment {
+        margin-top:20px
+        }
 }
 @media only screen and (max-width:500px) and (max-height:900px){
     .html, body {

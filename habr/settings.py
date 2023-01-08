@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tgmsg.apps.TgmsgConfig'
+    'tgmsg.apps.TgmsgConfig',
+    'taggit'
 ]
 
 MIDDLEWARE = [
@@ -116,6 +117,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'name'
 
 AUTH_USER_MODEL ='user_profile.MyUserProfile'
 # Static files (CSS, JavaScript, Images)
