@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'user_profile.apps.UserProfileConfig',
+    'notice.apps.NoticeConfig',
     'blog.apps.BlogConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,7 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tgmsg.apps.TgmsgConfig',
-    'taggit'
+    'taggit',
+    'django.contrib.humanize'
+
+
 ]
 
 MIDDLEWARE = [

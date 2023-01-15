@@ -55,17 +55,21 @@
 		{% if request.user.is_authenticated %}
 		<li><a href="{% url 'profile' %}">Профиль</a></li>
 		<li><a href="{% url 'update_profile' %}">Настройки</a></li>
+		<li><a href="{% url 'show-notifications' %}">Уведомления</a></li>
 		{%else%}
 		<li><a href="{% url 'home' %}">Лента вопросов</a></li>
+		<li><a href="{% url 'show-notifications' %}">Уведомления</a></li>
 		{%endif%}
 
 		<li class="share">
 		<p>Наши соц сети</p>
 		</li>
 	</ul>
+
+
 </td>
 
-<script src="{% static 'blog/js/prism.js' %}"></script>
+
 <!-- Sidebar слева -->
 
 

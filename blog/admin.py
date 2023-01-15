@@ -16,12 +16,12 @@ class QuestionAdmin(admin.ModelAdmin):
 #     prepopulated_fields = {'slug': ('name',)}
 
 class AnswerAdmin(admin.ModelAdmin):
-    list_display = ( 'post', 'created')
+    list_display = ( 'post', 'created', 'id')
     list_filter = ( 'created',)
     search_fields = ('name', 'text')
 
 admin.site.register(Answer, AnswerAdmin)
 
-
+admin.site.register(HelpedAnswer)
 admin.site.register(Questions,QuestionAdmin)
 # admin.site.register(Category,CategoryAdmin)

@@ -1,6 +1,9 @@
 {% extends 'blog/base.html' %}
-{% block content %}
+{% load humanize %}
 {%load static %}
+{% block content %}
+
+
 <td valign="top" class="content">
 
 
@@ -9,35 +12,41 @@
         <h3>{{more_q.author}}</h3>
         <h5 class="category">Категория: {{more_q.q_cat}}</h5>
         <h1 class="q_name">{{more_q.q_name}}</h1>
-<!--        {% autoescape off %}-->
+
         <p class="q_text">{{more_q.q_text}}</p>
-<!--        {% endautoescape %}-->
+
     </div>
 
 
     {% if request.user == more_q.author %}
     <button class="edit_btn"><a class="edit_text" href="{% url 'edit' more_q.pk %}">Редактировать</a></button>
 
-    <form method="post" action="{% url 'delete' more_q.pk %}">{% csrf_token %}
-<!--    <p>Are you sure you want to delete "{{ object }}"?</p>-->
-    {{ delete_form }}
-    <input type="submit" value="Удалить">
-    </form>
-    {% else %}
 
+<form id="delete_form{{more_q.id}}" action="{% url 'delete' more_q.pk %}" method="post">{% csrf_token %}{{ delete_form }}</form>
+          <a href="javascript:void()" onclick="delete_question{{more_q.id}}()">Удалить</a>
+          <script>
+              function delete_question{{more_q.id}}() {
+                  if (confirm("Вы уверены")) {
+                      document.getElementById('delete_form{{more_q.id}}').submit()
+                  }
+              }
+              </script>
+
+ {% else %}
     {% endif%}
-
+    {% if request.user != author%}
     <form method="post" action="{% url 'send_msg' more_q.pk%}">{% csrf_token %}
     {{ telegram_form }}
-
     <input type="submit" value="Отпрвавить жалобу">
     </form>
-
+    {%else%}
+      none
+    {%endif%}
 <hr>
 
 <!--Подсчет кол-ва ответов на вопрос-->
     <h4>
-        Ответы - {{more_q.comments.count}}
+        Ответы - {{more_q.answer_set.count}}
     </h4>
 <!--  форма для заполнения ответов -->
 
@@ -47,19 +56,20 @@
 
     <h2>Добавьте ваш ответ</h2>
     {% if user.is_authenticated%}
-    <form action="." method="post" id="formReview">
+
+    <form action="." method="post"  id="#formReview">
         {% csrf_token %}
         <input type="hidden" name="parent" id="contactparent" value="">
         <p><textarea id='contactcomment' rows="5" cols="45" name="text"></textarea></p>
-         <p><input type="submit" value="Добавить ответ"></p>
-    </form>
+
 
 <div id="text_test">
 
 <button  type="button" onclick="insert(' <pre><code>Тут код</code></pre> ')">Вставить код</button>
 
 </div>
-
+       <p><input type="submit" value="Добавить ответ"></p>
+    </form>
 <script>
     function insert (word) {
   let inp = document.querySelector('#contactcomment');
@@ -78,9 +88,8 @@
 {% endif %}
     <hr>
 
-{% for i in more_q.comments.all%}
-
-
+{% for i in more_q.get_answer%}
+<!---->
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 <div class="container">
 <div class="row">
@@ -93,11 +102,15 @@
             {%endif%}
             <div class="media-body u-shadow-v18 g-bg-secondary g-pa-30">
               <div class="g-mb-15">
+
                 <h5 class="h5 g-color-gray-dark-v1 mb-0"><a href="{% url 'show_other_profiles' i.author.id  %}">{{i.author}}</a></h5>
-                <span class="g-color-gray-dark-v4 g-font-size-12">{{ i.created|date:"d.m.Y" }}</span>
+                <span class="g-color-gray-dark-v4 g-font-size-12">{{ i.created|naturaltime }}</span>
               </div>
 
+
               <p>{{ i.text }}</p>
+
+
 
                 <li class="list-inline-item ml-auto">
                   <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#formReview"   onclick="addReview('{{i.author}}', '{{i.id}}')">
@@ -107,38 +120,99 @@
                 </li>
               </ul>
             </div>
+
         </div>
     </div>
 
+      {% for x in i.answer_set.all %}
 
 
-    <hr>
 
-{%endfor%}
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        <div class="container">
+        <div class="row">
+            <div id='text_answer' class="col-md-7">
 
-<!--Отображаение всех ответов-->
+                <div class="media g-mb-30 media-comment">
+
+                    {% if user.photo %}
+                    <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15" src="{{x.author.photo.url}}" alt="Image Description">
+                    {%else%}
+                    <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15" src="{% static 'blog/img/regular_user.jpg'%}" alt="Image Description">
+                    {%endif%}
+                    <div class="media-body u-shadow-v18 g-bg-secondary g-pa-30">
+                      <div class="g-mb-15">
+
+                        <h5 class="h5 g-color-gray-dark-v1 mb-0"><a href="{% url 'show_other_profiles' x.author.id  %}">{{x.author}}</a></h5>
+                        <span class="g-color-gray-dark-v4 g-font-size-12">{{ x.created|date:"d.m.Y" }}</span>
+                      </div>
+                      <p>{{ x.text }}</p>
+
+                        <li class="list-inline-item ml-auto">
+                          <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#formReview"   onclick="addReview('{{x.author}}', '{{x.id}}')">
+                            <i class='fa fa-reply g-pos-rel g-top-1 g-mr-3'></i>
+                            Reply
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+
+                </div>
+            </div>
 
 
-<!--    {% for ans in answer %}-->
-<!--    <p class="user_name_answer">{{user.username}}</p>-->
-<!--    <div class="answer">-->
-<!--        <p class="answer_text">-->
-<!--        {{ ans.text }}-->
-<!--        </p>-->
-<!--        {{ ans.created|date:"d.m.Y" }}-->
-<!--    </div>-->
-<hr>
-    {% empty %}
-        <p>Будьте первым, написавшим ответ!</p>
+                </div>
+            </div>
+
+    {% for r in x.answer_set.all %}
+
+
+
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        <div class="container">
+        <div class="row">
+            <div id='text_answer_answer' class="col-md-7">
+
+                <div class="media g-mb-30 media-comment">
+
+                    {% if user.photo %}
+                    <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15" src="{{r.author.photo.url}}" alt="Image Description">
+                    {%else%}
+                    <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15" src="{% static 'blog/img/regular_user.jpg'%}" alt="Image Description">
+                    {%endif%}
+                    <div class="media-body u-shadow-v18 g-bg-secondary g-pa-30">
+                      <div class="g-mb-15">
+
+                        <h5 class="h5 g-color-gray-dark-v1 mb-0"><a href="{% url 'show_other_profiles' r.author.id  %}">{{r.author}}</a></h5>
+                        <span class="g-color-gray-dark-v4 g-font-size-12">{{ r.created|date:"d.m.Y" }}</span>
+                      </div>
+                      <p>{{ r.text }}</p>
+
+                        <li class="list-inline-item ml-auto">
+                          <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#formReview"   onclick="addReview('{{x.author}}', '{{x.id}}')">
+                            <i class='fa fa-reply g-pos-rel g-top-1 g-mr-3'></i>
+                            Reply
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+
+                </div>
+            </div>
+
+
+                </div>
+            </div>
     {% endfor %}
-
+        {% endfor %}
+    {% endfor %}
 </div>
 </div>
 </td>
 <script>
-function addReview(name, id){
+function addReview(author, id){
     document.getElementById('contactparent').value = id;
-    document.getElementById('contactcomment').innerText = '${name}, '
+    document.getElementById('contactcomment').innerText = `${author}, `
 
 }
 </script>

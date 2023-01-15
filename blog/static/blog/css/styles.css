@@ -512,7 +512,12 @@
             margin-top: 0.21429rem !important;
         }
         }
-
+        .doesnt_active{
+            background-color:grey;
+        }
+        .active{
+            background-color:green;
+        }
         .g-height-50 {
         height: 50px;
         }
@@ -523,13 +528,15 @@
 
         @media (min-width: 0){
         .g-pa-30 {
-            padding: 2.14286rem !important;
+            padding: 1.14286rem !important;
         }
         }
 
         .g-bg-secondary {
-        background-color: #fafafa !important;
+        background-color: #EDF1F1   !important;
         }
+
+
 
         .u-shadow-v18 {
         box-shadow: 0 5px 10px -6px rgba(0, 0, 0, 0.15);

@@ -15,6 +15,7 @@ class AnswerForm(forms.ModelForm):
         self.fields['text'].widget.attrs.update({'id': 'test'})
 
 
+
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Questions
