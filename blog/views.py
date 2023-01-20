@@ -132,17 +132,9 @@ class QuestionDeleteView(LoginRequiredMixin, DeleteView):
     success_msg = 'Все ок'
     pk_url_kwarg = "q_pk"
 
-    def post(self, request, *args, **kwargs):
-        messages.success(self.request, self.success_msg)
-        return super().post(request)
-
-    def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.request.user != self.object.author:
-            return self.handle_no_permission()
-        success_url = self.get_success_url()
-        self.object.delete()
-        return HttpResponseRedirect(success_url)
+    def get_queryset(self):
+        user = self.request.user
+        return super().get_queryset().filter(author=user)
 
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1>Страница не найдена</h1>')
