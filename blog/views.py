@@ -1,27 +1,18 @@
-from _ast import operator
-from functools import reduce
 
-from django.contrib.admin.templatetags.admin_list import results
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect
+
 from django.urls import reverse_lazy
-from django.views import View
+
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, FormView, DeleteView, UpdateView, FormMixin
-from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
-# Create your views here.
-from django.contrib.auth import authenticate
-from notifications.signals import notify
-from taggit.views import TagListMixin
+from django.http import HttpResponse, JsonResponse, HttpResponseNotFound, HttpResponseRedirect
 
-from user_profile.forms import CustomUserProfile
-from .models import *
 from taggit.models import Tag
 from .utils import *
-from django.db.models import Q, F
-from django.http import Http404, HttpResponseRedirect
+from django.db.models import Q
+
 from .forms import *
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -91,15 +82,18 @@ class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
     context_object_name = 'more_q'
     form_class = AnswerForm
     success_url = reverse_lazy('question')
-    success_msg = 'Запись успешно обновлена'
+
 
 
     def get_success_url(self):
         return reverse_lazy('question', kwargs={'q_pk':self.get_object().id})
 
+
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = context['more_q']
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -129,7 +123,7 @@ class QuestionDeleteView(LoginRequiredMixin, DeleteView):
     model = Questions
     context_object_name = 'delete_form'
     success_url = reverse_lazy('home')
-    success_msg = 'Все ок'
+    success_msg = 'Вопрос успешно удалён'
     pk_url_kwarg = "q_pk"
 
     def get_queryset(self):
@@ -139,23 +133,7 @@ class QuestionDeleteView(LoginRequiredMixin, DeleteView):
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1>Страница не найдена</h1>')
 
-# class AnswerDeleteView(LoginRequiredMixin, DeleteView):
-#     model = Answer
-#     context_object_name = 'ans_delete_form'
-#     success_url = reverse_lazy('home')
-#     success_msg = 'Все ок'
-#
-#     def post(self, request, *args, **kwargs):
-#         messages.success(self.request, self.success_msg)
-#         return super().post(request)
-#
-#     def dispatch(self, request, *args, **kwargs):
-#         self.object = self.get_object()
-#         if self.request.user != self.object.author:
-#             return self.handle_no_permission()
-#         success_url = self.get_success_url()
-#         self.object.delete()
-#         return HttpResponseRedirect(success_url)
+
 
 
 class UpdateQuestionView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
@@ -164,7 +142,7 @@ class UpdateQuestionView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     form_class = QuestionForm
     success_url = reverse_lazy('home')
     context_object_name = 'form'
-    success_msg = 'Запись успешно обновлена'
+    success_msg = 'Вопрос успешно обновлен'
     pk_url_kwarg = "q_pk"
 
 
@@ -182,14 +160,52 @@ class UpdateQuestionView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return kwargs
 
 
+class DeleteAnswer(DeleteView):
+    model = Answer
+    template_name = 'blog/more_q.html'
+    context_object_name = 'answer_delete_form'
+    pk_url_kwarg = 'id'
+
+    def get_success_url(self):
+        return reverse('question', kwargs={'q_pk': self.get_object().id})
+
+    def get_queryset(self):
+        user = self.request.user
+        return super().get_queryset().filter(author=user)
+
+
+# def to_get_comment(request, id):
+#
+#     selected_comment = get_object_or_404(Answer, id=id)
+#     selected_comment.delete()
+#     return redirect('home')
+
+# class PreviewQuestion(SuccessMessageMixin, CreateView):
+#     model = Questions
+#     template_name = 'blog/preveiw.html'
+#     form_class = QuestionForm
+#     success_msg = 'Вопрос упешно добавлен'
+#     success_url = reverse_lazy('home')
+#     context_object_name = 'preview'
+#
+#     def get_success_url(self):
+#         return reverse('question', args=(self.object.id,))
+#
+#     def form_valid(self, form):
+#         self.object = form.save(commit=False)  # создаем экземпляр
+#         self.object.author = self.request.user  # получаем текущего user
+#         return super().form_valid(form)
 
 class AddQuestion(SuccessMessageMixin, CreateView):
     model = Questions
     template_name = 'blog/add_question.html'
     form_class = QuestionForm
-    success_msg = 'Запись успешно добавлена'
+    success_msg = 'Вопрос упешно добавлен'
     success_url = reverse_lazy('home')
     context_object_name = 'form'
+
+    def get_success_url(self):
+        return reverse('question', args=(self.object.id,))
 
     def form_valid(self, form):
         self.object = form.save(commit=False)  # создаем экземпляр

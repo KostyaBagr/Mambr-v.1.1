@@ -53,13 +53,12 @@ class SignUpView(CreateView):
 
     def post(self, request, *args, **kwargs):
         form = self.get_form(CreateUserProfile)
-        # form = CreateUserProfile(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.save()
             return self.form_valid(form)
         else:
-            return HttpResponse("Уберите пробел")
+            return self.form_invalid(form)
 
     def form_valid(self, form):
         form_valid = super().form_valid(form)

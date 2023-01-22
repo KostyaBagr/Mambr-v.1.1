@@ -5,10 +5,13 @@ from taggit.managers import TaggableManager
 
 class Questions(models.Model):
     """Модель для формирования вопросов"""
-    author = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,verbose_name='Владелец статьи',default='')
+
+    author = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,verbose_name='Владелец статьи')
     q_name = models.CharField(max_length=255, verbose_name='Вопрос')
     slug = models.SlugField(max_length=255, db_index=True, verbose_name='URL')  # unique= поле уникальное
     tags = TaggableManager()
+    difficult = models.ForeignKey('Difficult', on_delete=models.PROTECT,
+                            verbose_name='Сложность', null=True)
     q_text = models.TextField(verbose_name='Контент',default='')
     is_published = models.BooleanField(default=True, verbose_name='Состояние публикации')
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
@@ -29,7 +32,12 @@ class Questions(models.Model):
         ordering = ('time_create',)
 
 
-
+class Difficult(models.Model):
+    """Модель для формирования категорий вропросов"""
+    name = models.CharField(max_length=100, db_index=True,
+                            verbose_name='Категория_вопроса')
+    def __str__(self):
+        return self.name
 class Answer(models.Model):
     post = models.ForeignKey(Questions,on_delete=models.CASCADE,null=True)
     text = models.TextField(verbose_name='Ответ',default='')
@@ -49,13 +57,7 @@ class Answer(models.Model):
         notify = Notification(post=post, sender=sender, user=post.author,text_preview=text_preview, notification_type=2)
         notify.save()
 
-    def user_uncommented_post(sender, instance, *args, **kwargs):
-        answer = instance
-        post = answer.post
 
-        sender = answer.author
-        notify = Notification.objects.filter(post=post,author=post.author, sender=sender, user=post.author,notification_type=2)
-        notify.delete()
 
     class Meta:
         verbose_name = 'Ответы'
@@ -76,4 +78,3 @@ class HelpedAnswer(models.Model):
         return self.like_answer
 
 post_save.connect(Answer.user_commented_post,sender=Answer)
-post_delete.connect(Answer.user_uncommented_post,sender=Answer)

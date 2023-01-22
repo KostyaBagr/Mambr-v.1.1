@@ -3,13 +3,7 @@
 {% block content %}
 
 <td valign="top" class="content">
-    {% if messages%}
-    <div>
-    {% for m in messages %}
-    {{m}}
-    {% endfor%}
-    </div>
-{% endif%}
+
     {% if user.is_authenticated %}
 <!--    форма для добавления вопроса(поста) на страницу-->
 <form action="" method="post" enctype="multipart/form-data" >
@@ -23,10 +17,7 @@
 
 
 
-<!--<form enctype="multipart/form-data" method="post">-->
-<!--   <p><input type="file" name="f">-->
-<!--   <input type="submit" value="Отправить"></p>-->
-<!--  </form>-->
+
 
 <div id="test">
 <!--<button  type="button" onclick="insert()">Вставить фото</button>-->
@@ -46,11 +37,6 @@
 </script>
 
 
-<!--<button  type="button" onclick="insert(' aloha ')">insert aloha</button>-->
-<!--<input value='test'>-->
-
-<!--<input  type="button" onclick="document.getElementById('text_test').innerHTML += html_to_insert;"-->
-<!-- value = "Добавить код" />-->
 
 
     {% csrf_token %}
@@ -58,9 +44,11 @@
     <p><input type="submit" value="Обновить вопрос"></p>
     {% else%}
     <p><input type="submit" value="Задать вопрос"></p>
+
     {% endif%}
 
 </form>
+
     {% else%}
     <h1>Зайдите на сайт</h1>
     {% endif %}

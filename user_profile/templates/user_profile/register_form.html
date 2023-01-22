@@ -11,6 +11,7 @@
 
 					<form method="POST" action="">
 						{% csrf_token %}
+						{{ form.non_field_errors }}
 						<div class="input-group mb-3">
 							<div class="input-group-append">
 								<span class="input-group-text"><i class="fas fa-user"></i></span>
@@ -72,6 +73,9 @@
 			form_fields[field].className += ' form-control'
 		}
 	</script>
+{% for error in form.errors %}
+            {{ error }}
+        {% endfor %}
 </td>
 
 {% endblock %}

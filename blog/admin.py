@@ -21,7 +21,7 @@ class AnswerAdmin(admin.ModelAdmin):
     search_fields = ('name', 'text')
 
 admin.site.register(Answer, AnswerAdmin)
-
+admin.site.register(Difficult)
 admin.site.register(HelpedAnswer)
 admin.site.register(Questions,QuestionAdmin)
 # admin.site.register(Category,CategoryAdmin)

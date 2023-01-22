@@ -2,96 +2,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>{{title}}</title>
+    <title>{{title}}</title>
 
-	<link type="text/css" href="{% static 'blog/css/styles.css' %}" rel="stylesheet" />
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link type="text/css" href="{% static 'blog/css/styles.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<!--	<link rel="shortcut icon" href="#" type=""/>-->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!--	<link rel="shortcut icon" href="#" type=""/>-->
 
-	<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 
 
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
 
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 <table class="table-page" border=0 cellpadding="0" cellspacing="0">
-<tr><td valign=top>
+    <tr>
+        <td valign=top>
 
 
+            <div class="header">
+                <ul id="mainmenu" class="mainmenu">
+                    <li class="last"><a href="{% url 'home' %}">MAMBR</a></li>
 
 
-		<div class="header">
-			<ul id="mainmenu" class="mainmenu">
-				<li class="last"><a href="{% url 'home' %}">MAMBR</a></li>
+                    {% if user.is_authenticated%}
+
+                    <li class="last"><a href="{% url 'log_out' %}">Выход</a> | <a href="#">{{user.username}}</a></li>
+                    {%else%}
+                    <li class="last"><a href="{% url 'login'%}">Вход</a> | <a
+                            href="{% url 'registration'%}">Регистрация</a></li>
+                    {% endif %}
 
 
-				{% if user.is_authenticated%}
+                </ul>
 
-				<li class="last"><a href="{% url 'log_out' %}">Выход</a> | <a href="#">{{user.username}}</a></li>
-				{%else%}
-					<li class="last"><a href="{% url 'login'%}">Вход</a> | <a href="{% url 'registration'%}">Регистрация</a></li>
-				{% endif %}
+            </div>
 
+            <table class="table-content" border=0 cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top" class="left-chapters">
+                        <ul id="leftchapters">
+                            <!--		<li class="selected">Все категории</li>-->
+                            {% if request.user.is_authenticated %}
+                            <li><a href="{% url 'profile' %}">Профиль</a></li>
+                            <li><a href="{% url 'update_profile' %}">Настройки</a></li>
+                            <li><a href="{% url 'show-notifications' %}">Уведомления</a></li>
+                            {%else%}
+                            <li><a href="{% url 'home' %}">Лента вопросов</a></li>
 
-
-
-
-	</ul>
-
-	</div>
-
-<table class="table-content" border=0 cellpadding="0" cellspacing="0">
-<tr>
-	<td valign="top" class="left-chapters">
-	<ul id="leftchapters">
-<!--		<li class="selected">Все категории</li>-->
-		{% if request.user.is_authenticated %}
-		<li><a href="{% url 'profile' %}">Профиль</a></li>
-		<li><a href="{% url 'update_profile' %}">Настройки</a></li>
-		<li><a href="{% url 'show-notifications' %}">Уведомления</a></li>
-		{%else%}
-		<li><a href="{% url 'home' %}">Лента вопросов</a></li>
-		<li><a href="{% url 'show-notifications' %}">Уведомления</a></li>
-		{%endif%}
-
-		<li class="share">
-		<p>Наши соц сети</p>
-		</li>
-	</ul>
+                            {%endif%}
 
 
-</td>
+                            <li class="share">
+                                <p>Наши соц сети</p>
+                            </li>
+                        </ul>
+                    </td>
 
 
-<!-- Sidebar слева -->
+                    <!-- Sidebar слева -->
 
 
-<!-- Блок контента -->
-	<div>
-{% block content %}
-{% endblock %}
+                    <!-- Блок контента -->
+                    <div>
+                        {% block content %}
+                        {% endblock %}
 
 
-<!-- Конец блока контента -->
+                        <!-- Конец блока контента -->
 
 
-</tr></table>
+                </tr>
+            </table>
 
-</td></tr>
-<!-- Footer -->
-<tr><td>
-	<div id="footer">
-		<p>Сайт разработан - <a href='https://github.com/KostyaBagr' target="_blank" class="git_link">https://github.com/KostyaBagr</a></p>
+        </td>
+    </tr>
+    <!-- Footer -->
+    <tr>
+        <td>
+            <div id="footer">
+                <p>Сайт разработан - <a href='https://github.com/KostyaBagr' target="_blank" class="git_link">https://github.com/KostyaBagr</a>
+                </p>
 
-	</div>
-</td></tr></table>
+            </div>
+        </td>
+    </tr>
+</table>
 <!-- Конец footer'а и страницы -->
 </body>
 </html>

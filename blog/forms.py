@@ -19,7 +19,7 @@ class AnswerForm(forms.ModelForm):
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Questions
-        fields = ['q_name', 'tags', 'q_text']
+        fields = ['q_name', 'tags', 'q_text', 'difficult']
 
         widgets = {
             'q_name': forms.TextInput(attrs={'class': 'form-name'}),
