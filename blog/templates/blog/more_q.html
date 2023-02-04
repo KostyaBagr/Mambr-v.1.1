@@ -66,7 +66,7 @@
         <div class="question__body">
             {% autoescape off %}
             <div class="question__text js-question-text" itemprop="text description">
-                {{more_q.q_text}}
+                {{more_q.q_text | safe}}
             </div>
             {% endautoescape %}
             <ul class="question__attrs inline-list">
@@ -75,7 +75,7 @@
           Вопрос задан
           <time pubdate="" itemprop="dateCreated" datetime="2023-01-22 12:07:57"
                 >
-             {{ more_q.time_create|naturaltime }}        </time><span class="difficult">{{more_q.difficult}}</span>
+             {{ more_q.time_create|naturaltime }}        </time><span class="difficult">{{more_q.get_difficult_display}}</span>
                   </span>
 
                 </li>
@@ -139,29 +139,15 @@
     Ваш ответ на вопрос      </strong>
         {% if user.is_authenticated%}
 
-        <form action="." method="post" id="#formReview">
-            {% csrf_token %}
-            <input type="hidden" name="parent" id="contactparent" value="">
-            <p><textarea class="field__input textarea" cols="50" data-required="true" name="text" id="contactcomment" rows="7"></textarea></p>
+    <form action="." method="post" id="formReview">
+        {% csrf_token %}
+        {{form.media}}
+        <input type="hidden" name="parent" id="contactparent" value="">
 
-<!--            <div id="text_test">-->
-<!--                <button type="button" onclick="insert(' <pre><code>Тут код</code></pre> ')">Вставить код</button>-->
-<!--            </div>-->
+        <p><textarea id='contactcomment' rows="5" cols="45" name="text"></textarea></p>
+         <p><input type="submit" value="Добавить ответ"></p>
+    </form>
 
-            <button type="submit" class="btn btn-success">Опубликовать</button>
-        </form>
-        <script>
-    function insert (word) {
-  let inp = document.querySelector('#contactcomment');
-  let start = inp.selectionStart;
-  inp.value = inp.value.substring(0, start) + word +
-    inp.value.substring(inp.selectionEnd, inp.value.length)
-    inp.focus();
-    inp.setSelectionRange(start, start + word.length)
-}
-
-
-        </script>
  <script type="text/javascript">
     "use strict";
 
@@ -272,10 +258,14 @@
                                             Reply
                                         </a>
                                     </li>
-                                    </ul>
+                                    </ul><form  action="{% url 'delete_comment' x.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
+                                     <button type="submit" class="btn btn-light">Удалить</button>
+                                    </form>
+
                                 </div>
 
                             </div>
+
                         </div>
 
 
@@ -320,6 +310,9 @@
                                         </a>
                                     </li>
                                     </ul>
+                                    <form  action="{% url 'delete_comment' r.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
+                             <button type="submit" class="btn btn-light">Удалить</button>
+                            </form>
                                 </div>
 
                             </div>

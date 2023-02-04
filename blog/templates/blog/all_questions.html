@@ -19,6 +19,7 @@
 
     <br>
     <div class="topnav">
+
         <form action="{% url 'home' %}">
             {% if posts %}
             <input class="suggest__field ui-autocomplete-input" type="search"  autocomplete="off" name="search" placeholder="Найти вопрос, ответ, тег или пользователя" value="">
@@ -29,7 +30,7 @@
         </form>
     </div>
 
-<a href="{%url 'add_q' %}"><button type="button" class="btn btn-success">Задать вопрос</button></a>
+<li class="right" ><a href="{%url 'add_q' %}"><button type="button" class="btn btn-success">Задать вопрос</button></a></li>
 
 
 
@@ -53,7 +54,7 @@
               <span class="svg-icon_level svg-icon_level-2">
               </span>
               <span class="question__complexity-text">
-                {{i.difficult}}              </span>
+                {{i.get_difficult_display}}              </span>
             </span>
                         <span class="question__complexity">
               <span class="svg-icon_level svg-icon_level-2">
@@ -79,7 +80,7 @@
                 </div>
             </div>
             <div class="question__answers-count ">
-                <a class="mini-counter" href="https://qna.habr.com/q/1244140#answers"
+                <a class="mini-counter" href=""
                    title="Количество ответов на вопрос" role="lazy_anchor">
                     <div class="mini-counter__count mini-counter__count_grey">
                         {{i.answer_set.count}}

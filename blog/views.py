@@ -83,12 +83,8 @@ class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
     form_class = AnswerForm
     success_url = reverse_lazy('question')
 
-
-
     def get_success_url(self):
         return reverse_lazy('question', kwargs={'q_pk':self.get_object().id})
-
-
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -100,6 +96,7 @@ class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
         self.object = self.get_object()
         form = self.get_form()
         if form.is_valid():
+
             if request.POST.get("parent", None):
                 form.parent_id = int(request.POST.get("parent"))
                 parent_obj = Answer.objects.get(id=form.parent_id)
@@ -115,6 +112,8 @@ class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
         self.object.post = self.get_object()
         self.object.author = self.request.user
         self.object.save()
+
+
         return super().form_valid(form)
 
 
@@ -167,36 +166,16 @@ class DeleteAnswer(DeleteView):
     pk_url_kwarg = 'id'
 
     def get_success_url(self):
-        return reverse('question', kwargs={'q_pk': self.get_object().id})
+        return reverse('question', kwargs={'q_pk':  self.object.post_id})
 
     def get_queryset(self):
         user = self.request.user
         return super().get_queryset().filter(author=user)
 
 
-# def to_get_comment(request, id):
-#
-#     selected_comment = get_object_or_404(Answer, id=id)
-#     selected_comment.delete()
-#     return redirect('home')
 
-# class PreviewQuestion(SuccessMessageMixin, CreateView):
-#     model = Questions
-#     template_name = 'blog/preveiw.html'
-#     form_class = QuestionForm
-#     success_msg = 'Вопрос упешно добавлен'
-#     success_url = reverse_lazy('home')
-#     context_object_name = 'preview'
-#
-#     def get_success_url(self):
-#         return reverse('question', args=(self.object.id,))
-#
-#     def form_valid(self, form):
-#         self.object = form.save(commit=False)  # создаем экземпляр
-#         self.object.author = self.request.user  # получаем текущего user
-#         return super().form_valid(form)
 
-class AddQuestion(SuccessMessageMixin, CreateView):
+class AddQuestion(SuccessMessageMixin,CreateView):
     model = Questions
     template_name = 'blog/add_question.html'
     form_class = QuestionForm
@@ -208,6 +187,7 @@ class AddQuestion(SuccessMessageMixin, CreateView):
         return reverse('question', args=(self.object.id,))
 
     def form_valid(self, form):
+
         self.object = form.save(commit=False)  # создаем экземпляр
         self.object.author = self.request.user  # получаем текущего user
         self.object.save()  # сохраняем в бд

@@ -6,51 +6,35 @@
 
     {% if user.is_authenticated %}
 <!--    форма для добавления вопроса(поста) на страницу-->
+
 <form action="" method="post" enctype="multipart/form-data" >
-{% for f in form %}
-    <div class="form-error">{{ f.non_field_errors }}</div>
-
-    <p><label for="{{ f.id_form_label }}" >{{f.label}}: </label><p>{{ f }}</p>
-
-<div class="form-error">{{ f.errors }}</div>
-{% endfor %}
-
-
-
-
-
-<div id="test">
-<!--<button  type="button" onclick="insert()">Вставить фото</button>-->
-<button  type="button" onclick="insert(' <pre><code>Тут код</code></pre> ')">Вставить код</button>
-<!--<button  type="button" onclick="insert(' <h1></h1> ')">Вставить заголовок</button>-->
-</div>
-<script>
-    function insert (word) {
-  let inp = document.querySelector('#text_test');
-  let start = inp.selectionStart;
-  inp.value = inp.value.substring(0, start) + word +
-    inp.value.substring(inp.selectionEnd, inp.value.length)
-    inp.focus();
-    inp.setSelectionRange(start, start + word.length)
-}
-
-</script>
-
-
-
-
     {% csrf_token %}
+
+    {{form.media}}
+
+    <p class="field_label">{{form.q_name.label}}</p>
+    <div class="forms-errors">{{ form.q_name.errors }}</div>
+    <div class="field_desc">Укажите от 1 до 5 тегов — предметных областей, к которым вопрос относится.</div>
+
+    <div class="field_input">{{form.q_name}}</div>
+
+    <p class="field_label" >{{form.tags.label}}</p><div class="field_desc">Укажите теги — предметных областей, к которым вопрос относится.</div><div class="field_input">{{form.tags}}
+    <p class="field_label" >{{form.q_text.label}}</p><div class="field_desc">Опишите в подробностях свой вопрос, чтобы получить более точный ответ.</div><div id='field_select' class="field_input">{{form.q_text}}</div>
+    <p class="field_label" >{{form.difficult.label}}</p><div class="field_input">{{form.difficult}}</div><br>
     {% if update_button %}
     <p><input type="submit" value="Обновить вопрос"></p>
     {% else%}
-    <p><input type="submit" value="Задать вопрос"></p>
-
+    <p><input type="submit" id="submit-button" name='submit-button' value="Отправить"></p>
     {% endif%}
 
 </form>
 
+<script>hljs.initHighlightingOnLoad();</script>
+<!--    далее скрипт ckeditor-->
+
     {% else%}
     <h1>Зайдите на сайт</h1>
     {% endif %}
+
 </td>
 {% endblock %}

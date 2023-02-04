@@ -141,6 +141,48 @@
     float:right;
     }
 
+.recaptcha_widget input[type=text], .field__select, input[type=text], input[type=password], input[type=email], input[type=url], input[type=phone], input[type=tel], input[type=number], input[type=datetime], input[type=date], input[type=search], input[type=datetime-local], textarea, .field__input {
+    font-family: toster-text,Helvetica,Arial,sans-serif;
+    border-color: #d2d6d7;
+    border-radius: 5px;
+    line-height: 1.5em;
+    color: #333;
+    font-size: 15px;
+    width: 80%;
+    z-index: 0;
+    height: 30px;
+    margin-bottom:10px;
+}
+.forms-errors{
+    color:red;
+}
+li{
+list-style-type: none;
+}
+.field_desc {
+    color: #aeb8bc;
+    font-size: 13px;
+    line-height: 1.2em;
+    margin-bottom: 10px;
+    max-width: 550px;
+}
+.field_select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 0.01px;
+    text-overflow: ' ';
+    padding: 0 24px 0 9px;
+    width: 165px;
+    line-height: 1em;
+}
+.field_label {
+    line-height: 1.5em;
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+    display: block;
+}
     #footer {
 
         box-sizing: border-box;
@@ -1061,6 +1103,29 @@ html {
     font-weight: 700;
     margin: 0;
     line-height: 1.5em;
+}
+.question_btn{
+    display: none;
+    margin-left:500px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: 0 0;
+
+}
+.badge {
+	position: absolute;
+
+	margin-left:7%;
+	padding: 1px 7px;
+	top:215px;
+	border-radius: 50%;
+	background: grey;
+	color: white;
+	font-weight: bold;
 }
 
 textarea, textarea.field__input {

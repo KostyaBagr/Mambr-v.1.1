@@ -8,9 +8,15 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
+    <script src="/assets/ckeditor/ckeditor-init.js"></script>
+    <script src="/assets/ckeditor/ckeditor/ckeditor.js"></script>
+
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-
+       <link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <!--	<link rel="shortcut icon" href="#" type=""/>-->
 
@@ -31,6 +37,7 @@
             <div class="header">
                 <ul id="mainmenu" class="mainmenu">
                     <li class="last"><a href="{% url 'home' %}">MAMBR</a></li>
+
 
 
                     {% if user.is_authenticated%}
@@ -54,7 +61,12 @@
                             {% if request.user.is_authenticated %}
                             <li><a href="{% url 'profile' %}">Профиль</a></li>
                             <li><a href="{% url 'update_profile' %}">Настройки</a></li>
+
+                                <span class="badge">{{ notifications.count }}</span>
                             <li><a href="{% url 'show-notifications' %}">Уведомления</a></li>
+
+                            <li><a href="{% url 'home' %}">Лента вопросов</a></li>
+
                             {%else%}
                             <li><a href="{% url 'home' %}">Лента вопросов</a></li>
 

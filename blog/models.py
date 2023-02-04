@@ -1,21 +1,26 @@
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save
 from notice.models import Notification
 from user_profile.models import *
 from taggit.managers import TaggableManager
-
+from ckeditor_uploader.fields import RichTextUploadingField
+from django.core.mail import send_mail
 class Questions(models.Model):
     """Модель для формирования вопросов"""
 
+
+    COMPLEXITY =[
+        ('E', 'Легкий'),
+        ('M', 'Средний'),
+        ('D', 'Сложный'),
+    ]
+
     author = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,verbose_name='Владелец статьи')
     q_name = models.CharField(max_length=255, verbose_name='Вопрос')
-    slug = models.SlugField(max_length=255, db_index=True, verbose_name='URL')  # unique= поле уникальное
     tags = TaggableManager()
-    difficult = models.ForeignKey('Difficult', on_delete=models.PROTECT,
-                            verbose_name='Сложность', null=True)
-    q_text = models.TextField(verbose_name='Контент',default='')
+    difficult = models.CharField(max_length=1, choices=COMPLEXITY, default='E')
+    q_text = RichTextUploadingField(blank=True, null=True)
     is_published = models.BooleanField(default=True, verbose_name='Состояние публикации')
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
-
 
 
     def get_absolute_url(self):
@@ -32,15 +37,10 @@ class Questions(models.Model):
         ordering = ('time_create',)
 
 
-class Difficult(models.Model):
-    """Модель для формирования категорий вропросов"""
-    name = models.CharField(max_length=100, db_index=True,
-                            verbose_name='Категория_вопроса')
-    def __str__(self):
-        return self.name
+
 class Answer(models.Model):
     post = models.ForeignKey(Questions,on_delete=models.CASCADE,null=True)
-    text = models.TextField(verbose_name='Ответ',default='')
+    text = RichTextUploadingField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
     parent = models.ForeignKey('self', verbose_name="Родитель", on_delete=models.SET_NULL, blank=True, null=True)
@@ -57,24 +57,12 @@ class Answer(models.Model):
         notify = Notification(post=post, sender=sender, user=post.author,text_preview=text_preview, notification_type=2)
         notify.save()
 
-
-
     class Meta:
         verbose_name = 'Ответы'
         ordering = ('created',)
     def __str__(self):
         return self.text
 
-#answer
 
-
-class HelpedAnswer(models.Model):
-    like_answer = models.ManyToManyField(MyUserProfile, blank=True, related_name='likes')
-    dislike_answer = models.ManyToManyField(MyUserProfile, blank=True, related_name='dislikes')
-
-    class Meta:
-        verbose_name = "Правильные ответы"
-    def __str__(self):
-        return self.like_answer
 
 post_save.connect(Answer.user_commented_post,sender=Answer)

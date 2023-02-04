@@ -22,6 +22,7 @@ from blog.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('blog.urls')),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
     path('', include('user_profile.urls')),
 ]
 urlpatterns+= static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
