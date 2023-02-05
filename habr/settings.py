@@ -41,10 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tgmsg.apps.TgmsgConfig',
-    'taggit',
     'django.contrib.humanize',
     'ckeditor',
     'ckeditor_uploader',
+    'taggit',
 
 
 ]
