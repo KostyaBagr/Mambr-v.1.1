@@ -212,10 +212,11 @@
                                 </a>
                             </li>
                             </ul>
-
+                            {%if request.user == more_q.author%}
                             <form  action="{% url 'delete_comment' i.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
                              <button type="submit" class="btn btn-light">Удалить</button>
                             </form>
+                            {%endif%}
                         </div>
 
                     </div>
@@ -258,9 +259,12 @@
                                             Reply
                                         </a>
                                     </li>
-                                    </ul><form  action="{% url 'delete_comment' x.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
+                                    </ul>
+                                    {%if request.user == more_q.author%}
+                                    <form  action="{% url 'delete_comment' x.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
                                      <button type="submit" class="btn btn-light">Удалить</button>
                                     </form>
+                                    {%endif%}
 
                                 </div>
 
@@ -310,9 +314,12 @@
                                         </a>
                                     </li>
                                     </ul>
+                                    {%if request.user == more_q.author%}
                                     <form  action="{% url 'delete_comment' r.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
-                             <button type="submit" class="btn btn-light">Удалить</button>
-                            </form>
+                                    <button type="submit" class="btn btn-light">Удалить</button>
+                                    </form>
+                                    {%endif%}
+
                                 </div>
 
                             </div>

@@ -112,8 +112,6 @@ class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
         self.object.post = self.get_object()
         self.object.author = self.request.user
         self.object.save()
-
-
         return super().form_valid(form)
 
 

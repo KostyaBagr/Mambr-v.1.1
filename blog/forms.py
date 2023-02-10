@@ -1,8 +1,10 @@
+
 from django.core.exceptions import ValidationError
 
 from .models import *
 from django import forms
 from django.forms import ModelForm, widgets
+
 
 
 class AnswerForm(forms.ModelForm):
@@ -13,9 +15,7 @@ class AnswerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['text'].widget.attrs.update({'id': 'test'})
-    def send_email(self):
-        send_answer_by_email.delay(
-        self.cleaned_data['text'])
+
 
 
 
