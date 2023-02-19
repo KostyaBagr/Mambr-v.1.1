@@ -55,7 +55,9 @@ class SignUpView(CreateView):
     success_url = reverse_lazy('home')
     template_name = 'user_profile/register_form.html'
     def form_valid(self, form):
+
         form_valid = super().form_valid(form)
+
         username = form.cleaned_data["username"]
         email = form.cleaned_data['email']
         password = self.request.POST['password1']
@@ -70,12 +72,16 @@ class SignUpView(CreateView):
 def update_profile(request):
     user = request.user
     form = CustomUserProfile(instance=user)
+    msg = False
     if request.method == 'POST':
         form = CustomUserProfile(request.POST,request.FILES, instance=user)
         form.save()
-        return redirect('profile')
+        # return redirect('profile')
+        msg =True
     dict = {
-        'form':form
+        'msg':msg,
+        'form':form,
+        'title': "Редактирование профиля"
     }
     return render(request, 'user_profile/user_settings.html', dict)
 

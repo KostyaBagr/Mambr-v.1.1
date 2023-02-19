@@ -38,19 +38,14 @@
                 <ul id="mainmenu" class="mainmenu">
                     <li class="last"><a href="{% url 'home' %}">MAMBR</a></li>
 
-
-
                     {% if user.is_authenticated%}
-
                     <li class="last"><a href="{% url 'log_out' %}">Выход</a> | <a href="#">{{user.username}}</a></li>
                     {%else%}
                     <li class="last"><a href="{% url 'login'%}">Вход</a> | <a
                             href="{% url 'registration'%}">Регистрация</a></li>
                     {% endif %}
 
-
                 </ul>
-
             </div>
 
             <table class="table-content" border=0 cellpadding="0" cellspacing="0">
@@ -61,8 +56,10 @@
                             {% if request.user.is_authenticated %}
                             <li><a href="{% url 'profile' %}">Профиль</a></li>
                             <li><a href="{% url 'update_profile' %}">Настройки</a></li>
+                            {% if user.noti_from_user.count %}
 
-                                <span class="badge">{{ notifications.count }}</span>
+                              <span class="badge">{{user.noti_from_user.count}}</span>
+                            {%endif%}
                             <li><a href="{% url 'show-notifications' %}">Уведомления</a></li>
 
                             <li><a href="{% url 'home' %}">Лента вопросов</a></li>

@@ -45,8 +45,9 @@ class MainListVIew(TagMixin, DataMixin, ListView):
     def get_queryset(self, *, object_list=None, **kwargs):
         q = self.request.GET.get("search", '')
 
-        object_list = Questions.objects.filter(Q(q_name__icontains=q))
+        object_list = Questions.objects.filter(Q(q_name__iregex=q))
         return object_list.filter(is_published=True).order_by('-time_create')
+
 
 
 class TagListView(TagMixin, ListView):
@@ -180,7 +181,10 @@ class AddQuestion(SuccessMessageMixin,CreateView):
     success_msg = 'Вопрос упешно добавлен'
     success_url = reverse_lazy('home')
     context_object_name = 'form'
-
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Задать вопрос"
+        return context
     def get_success_url(self):
         return reverse('question', args=(self.object.id,))
 

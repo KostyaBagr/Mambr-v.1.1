@@ -4,54 +4,54 @@
 {% block content %}
 <td valign="top" class="content">
 
-{% for notification in notifications %}
-
-
-{% if notification.notification_type == 2 %}
+    {%if notifications.count >= 1 %}
     <h4><a href="{% url 'delete-all_notifications' %}" class="delete">Очистить все</a></h4>
+    {%endif%}
+    {% for notification in notifications %}
+    {% if notification.notification_type == 2 %}
 
-      <div class="notification">
-      <article class="media">
-  <figure class="media-left">
 
-        {% if notification.sender.photo %}
-        <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15" src="{{ notification.sender.photo.url }}" alt="Image Description">
-          {% else %}
-            <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
-        {% endif %}
+    <div class="notification">
 
-  </figure>
+        <article class="media">
+            <figure class="media-left">
 
-  <div class="media-content">
-    <div class="content">
-        <strong><a href="{% url 'question' notification.post.id%}">{{notification.post}}</a></strong><br>
-        <strong>{{ notification.sender }}</strong>
+                {% if notification.sender.photo %}
+                <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15"
+                     src="{{ notification.sender.photo.url }}" alt="Image Description">
+                {% else %}
+                <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
+                {% endif %}
 
-        <hr>
-        Оставил комментарий:
-        <strong>{{ notification.text_preview }}</strong><br>
-        <strong><small>{{ notification.date }}</small></strong>
+            </figure>
+
+            <div class="media-content">
+                <div class="content">
+                    <strong><a href="{% url 'question' notification.post.id%}">{{notification.post}}</a></strong><br>
+                    <strong>{{ notification.sender }}</strong>
+
+                    <hr>
+                    Оставил комментарий:
+                    <strong>{{ notification.text_preview }}</strong><br>
+                    <strong><small>{{ notification.date }}</small></strong>
+                </div>
+            </div>
+
+            <div class="media-right">
+                <figure class="image is-128x128">
+                    <img src="{{ notification.post.picture.url }}">
+                </figure>
+            </div>
+        </article>
+
     </div>
-  </div>
+    {% endif %}
+    {% empty%}
+    <h2>уведомлений нету</h2>
 
-  <div class="media-right">
-    <figure class="image is-128x128">
-      <img src="{{ notification.post.picture.url }}">
-  </figure>
-  </div>
-</article>
+    {% endfor %}
 
-      </div>
-
-{% endif %}
-{%empty%}
-<h2>уведомлений нету</h2>
-{% endfor %}
-<!-- FOR LIKES --->
-
-
-
-
+    <!-- FOR LIKES --->
 
 </td>
 {%endblock%}

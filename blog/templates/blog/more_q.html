@@ -131,8 +131,11 @@
 
         <!--  форма для заполнения ответов -->
 
-        {% if new_message %}
-        <h3>Ваш ответ был добавлен</h3>
+        {% if success_msg %}
+        <div class="alert alert-success" role="alert">
+    Ваш ответ был добавлен
+        </div>
+
         {% endif %}
 
         <strong class="section-header__title">
@@ -213,9 +216,17 @@
                             </li>
                             </ul>
                             {%if request.user == more_q.author%}
-                            <form  action="{% url 'delete_comment' i.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
-                             <button type="submit" class="btn btn-light">Удалить</button>
+                            <form  id="delete_form2{{i.id}}" action="{% url 'delete_comment' i.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
+                        <a href="javascript:void()" onclick="delete_question2{{i.id}}()"><button type='submit' id="delete_button2" class="btn btn-light">Удалить</button>
                             </form>
+
+                    <script>
+                      function delete_question2{{i.id}}() {
+                          if (confirm("Вы уверены")) {
+                              document.getElementById('delete_form2{{i.id}}').submit()
+                          }
+                      }
+                      </script>
                             {%endif%}
                         </div>
 
@@ -261,9 +272,17 @@
                                     </li>
                                     </ul>
                                     {%if request.user == more_q.author%}
-                                    <form  action="{% url 'delete_comment' x.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
-                                     <button type="submit" class="btn btn-light">Удалить</button>
+                                    <form  id="delete_form3{{x.id}}" action="{% url 'delete_comment' x.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
+                        <a href="javascript:void()" onclick="delete_question3{{x.id}}()"><button type='submit' id="delete_button3" class="btn btn-light">Удалить</button>
                                     </form>
+
+                    <script>
+                      function delete_question3{{x.id}}() {
+                          if (confirm("Вы уверены")) {
+                              document.getElementById('delete_form3{{x.id}}').submit()
+                          }
+                      }
+                      </script>
                                     {%endif%}
 
                                 </div>
@@ -315,9 +334,17 @@
                                     </li>
                                     </ul>
                                     {%if request.user == more_q.author%}
-                                    <form  action="{% url 'delete_comment' r.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
-                                    <button type="submit" class="btn btn-light">Удалить</button>
+                                    <form  id="delete_form4{{r.id}}" action="{% url 'delete_comment' r.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
+                                <a href="javascript:void()" onclick="delete_question4{{r.id}}()"><button type='submit' id="delete_button4" class="btn btn-light">Удалить</button>
                                     </form>
+
+                    <script>
+                      function delete_question4{{r.id}}() {
+                          if (confirm("Вы уверены")) {
+                              document.getElementById('delete_form4{{r.id}}').submit()
+                          }
+                      }
+                      </script>
                                     {%endif%}
 
                                 </div>

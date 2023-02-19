@@ -14,7 +14,7 @@
 
     <p class="field_label">{{form.q_name.label}}</p>
     <div class="forms-errors">{{ form.q_name.errors }}</div>
-    <div class="field_desc">Укажите от 1 до 5 тегов — предметных областей, к которым вопрос относится.</div>
+    <div class="field_desc">Сформулируйте вопрос так, чтобы сразу было понятно, о чём речь.</div>
 
     <div class="field_input">{{form.q_name}}</div>
 
@@ -26,7 +26,7 @@
     {% else%}
     <p><input type="submit" id="submit-button" name='submit-button' value="Отправить"></p>
     {% endif%}
-
+</div>
 </form>
 
 <script>hljs.initHighlightingOnLoad();</script>

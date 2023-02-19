@@ -1,29 +1,60 @@
 {% extends 'blog/base.html' %}
 {% block content%}
+{%load static%}
 <td valign="top" class="content">
-<div class="row">
-	<div class="col-md-3">
-		<div class="card card-body">
-			<a class="btn btn-warning" href="{% url 'profile' %}"> &#8592; Back to Profile</a>
-			<hr>
-			<h3 style="text-align: center">Account Settings</h3>
-			<hr>
-			<img class="profile-pic" src="{{request.user.customer.profile_pic.url}}" >
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card card-body">
+                <a class="btn btn-warning" href="{% url 'profile' %}"> &#8592; Bернуться в профиль</a>
+                <hr>
+                <h3 style="text-align: center">Настройки аккаунта</h3>
+                <hr>
+                <img class="profile-pic" src="{{request.user.customer.profile_pic.url}}">
 
-		</div>
-	</div>
-	<div class="col-md-9">
-		<div class="card card-body">
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card card-body">
 
-			<form method="POST" action="" enctype="multipart/form-data">
-				{% csrf_token %}
-				{{form.as_p}}
+                <form method="POST" action="" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <p>
+                        <label for="id_username">Имя пользователя:</label>
+                        {{form.username}}
 
-			<input class="btn btn-primary" type="submit" name="Update Information">
-			</form>
-		</div>
-	</div>
-</div>
+                        <span class="helptext">Обязательное поле. Не более 150 символов. Только буквы, цифры и символы @/./+/-/_.</span>
+
+
+                    </p>
+                    <p>
+                        <label for="id_email">Почта пользователя:</label>
+                        {{form.email}}
+
+
+                    </p>
+                    <p>
+    			<label for="id_bio">Описание профиля пользователя:</label>
+    			{{form.bio}}
+
+
+  				</p>
+                    <p>
+                        <label for="id_photo">Photo:</label>
+
+                        {{form.photo}}
+
+
+                        {% if msg == True %}
+                        <div class="alert alert-success" role="alert">
+                          Профиль успешно обновлен! <a href="{% url 'profile'%}">Перейти в профиль</a>
+                        </div>
+                        {%endif%}
+  </p>
+                        <input class="btn btn-primary" type="submit" name="Изменить профиль">
+                </form>
+            </div>
+        </div>
+    </div>
 
 </td>
 {%endblock%}

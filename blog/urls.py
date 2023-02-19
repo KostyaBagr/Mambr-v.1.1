@@ -15,7 +15,7 @@ urlpatterns = [
     path('update/<int:q_pk>/', UpdateQuestionView.as_view(), name='edit'),
     path('comment/<int:id>/',DeleteAnswer.as_view(), name='delete_comment'),
     path('notifications/', ShowNotifications, name='show-notifications'),
-    path('<notice_id>/delete', DeleteNotifications, name='delete-notifications'),
+
     path('all_delete/', DeleteAllAuthorNotice, name='delete-all_notifications'),
 
 
