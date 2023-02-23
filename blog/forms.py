@@ -11,7 +11,7 @@ class AnswerForm(forms.ModelForm):
     class Meta:
         model = Answer
         fields = ['text']
-        labels = {'text': 'Ваш ответ'}
+        labels = {'text': ''}
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['text'].widget.attrs.update({'id': 'test'})

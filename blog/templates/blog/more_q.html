@@ -147,7 +147,10 @@
         {{form.media}}
         <input type="hidden" name="parent" id="contactparent" value="">
 
-        <p><textarea id='contactcomment' rows="5" cols="45" name="text"></textarea></p>
+        <div id="contactcomment" >
+            <p>{{form.as_p}}</p>
+        </div>
+
          <p><input type="submit" value="Добавить ответ"></p>
     </form>
 
@@ -204,7 +207,7 @@
                             </div>
 
 
-                            <p>{{ i.text }}</p>
+                            <p>{{ i.text|safe }}</p>
 
 
                             <li class="list-inline-item ml-auto">
@@ -261,7 +264,7 @@
                                         </h5>
                                         <span class="g-color-gray-dark-v4 g-font-size-12">{{ x.created|date:"d.m.Y" }}</span>
                                     </div>
-                                    <p>{{ x.text }}</p>
+                                    <p>{{ x.text|safe }}</p>
 
                                     <li class="list-inline-item ml-auto">
                                         <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover"
@@ -323,7 +326,7 @@
                                         </h5>
                                         <span class="g-color-gray-dark-v4 g-font-size-12">{{ r.created|date:"d.m.Y" }}</span>
                                     </div>
-                                    <p>{{ r.text }}</p>
+                                    <p>{{ r.text|safe }}</p>
 
                                     <li class="list-inline-item ml-auto">
                                         <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover"

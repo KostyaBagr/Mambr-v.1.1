@@ -37,11 +37,6 @@ class Questions(models.Model):
         verbose_name_plural = 'Вопросы'
         ordering = ('time_create',)
 
-
-
-
-
-
 class Answer(models.Model):
     post = models.ForeignKey(Questions,on_delete=models.CASCADE,null=True)
     text = RichTextUploadingField(blank=True, null=True)
@@ -61,13 +56,6 @@ class Answer(models.Model):
         notify = Notification(post=post, sender=sender, user=post.author,text_preview=text_preview, notification_type=2)
         notify.save()
 
-    # def user_del_commented_post(sender, instance, *args, **kwargs):
-    #     answer = instance
-    #     post = answer.post
-    #     sender = answer.author
-    #
-    #     notify = Notification.objects.filter(post=post, user=post.user, sender= sender, notification_type=2)
-    #     notify.delete()
 
 
     class Meta:
@@ -79,4 +67,4 @@ class Answer(models.Model):
 
 
 post_save.connect(Answer.user_commented_post,sender=Answer)
-# post_delete.connect(Answer.user_del_commented_post,sender=Answer)
+

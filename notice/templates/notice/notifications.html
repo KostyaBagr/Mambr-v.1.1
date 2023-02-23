@@ -32,7 +32,7 @@
 
                     <hr>
                     Оставил комментарий:
-                    <strong>{{ notification.text_preview }}</strong><br>
+                    <strong>{{ notification.text_preview|safe }}</strong><br>
                     <strong><small>{{ notification.date }}</small></strong>
                 </div>
             </div>
