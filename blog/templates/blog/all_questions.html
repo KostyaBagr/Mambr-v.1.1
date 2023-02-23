@@ -1,58 +1,115 @@
 {% extends 'blog/base.html' %}
 
-
+{% load humanize %}
 {% block content %}
 
 <!-- Конец Sidebar'а -->
 <td valign="top" class="content">
-	<!-- Хлебные крошки -->
+    <!-- Хлебные крошки -->
+ {% if messages%}
+    {% for m in messages %}
+<div class="alert alert-success" role="alert">
+    <div>
+    {{m}}
+    </div>
+</div>
+    {% endfor%}
+{% endif%}
 
-	<div class="topnav">
-	 <form  action="{% url 'home' %}">
-		 {% if posts %}
-				<input class="srch" type="text" name="search" placeholder="Поиск..">
-		 {% else %}
-		 	<input class="srch2" type="text" name="search" placeholder="Поиск..">
-		 		<h1>По вашему запросу ничего не найдено</h1>
-		 {% endif %}
-			</form>
+
+    <br>
+    <div class="topnav">
+
+        <form action="{% url 'home' %}">
+            {% if posts %}
+            <input class="suggest__field ui-autocomplete-input" type="search"  autocomplete="off" name="search" placeholder="Найти вопрос, ответ, тег или пользователя" value="">
+            {% else %}
+            <input class="suggest__field ui-autocomplete-input"  type="search" autocomplete="off" name="search" placeholder="Найти вопрос, ответ, тег или пользователя" value="">
+            <h1>По вашему запросу ничего не найдено</h1>
+            {% endif %}
+        </form>
     </div>
 
-
-	<button><a class="add_question" href="{% url 'add_q' %}">Добавить вопрос</a></button>
-
+<li class="right" ><a href="{%url 'add_q' %}"><button type="button" class="btn btn-success">Задать вопрос</button></a></li>
 
 
-{% for i in posts %}
-<div class="main_cards">
-{% for tag in i.tags.all %}
-        <a href="{% url 'taggit' tag.slug %}">
-            {{ tag.name }}
-        </a>
-        {% if not forloop.last %}, {% endif %}
+
+    {% for i in posts %}
+    <li class="content-list__item" role="content-list_item">
+        <div class="question question_short">
+            <div class="question__content">
+                <div class="question__content_fluid">
+                    <div class="question__tags">
+                        <ul class="tags-list tags-list_short">
+                            <li class="tags-list__item  tag_153197">
+                                {% for tag in i.tags.all %}
+                                <a href="{% url 'taggit' tag.slug %}">
+                                    {{ tag.name }}
+                                </a>
+                                {% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </li>
+                        </ul>
+                        <span class="question__complexity">
+              <span class="svg-icon_level svg-icon_level-2">
+              </span>
+              <span class="question__complexity-text">
+                {{i.get_difficult_display}}              </span>
+            </span>
+                        <span class="question__complexity">
+              <span class="svg-icon_level svg-icon_level-2">
+              </span>
+                    </div>
+                    <h2 class="question__title">
+                        <a class="question__title-link question__title-link_list" href="{{i.get_absolute_url}}">
+                            {{i.q_name}} </a>
+                    </h2>
+                    <ul class="question__attrs inline-list">
+                        <li class="inline-list__item inline-list__item_bullet">
+            <span class="question__views-count" title="Автор вопроса">
+                              {{i.author}}                          </span>
+                        </li>
+                        <li class="inline-list__item inline-list__item_bullet">
+                            <time class="question__date question__date_publish" pubdate=""
+                                  title="Дата публикации: 21 янв. 2023, в 21:53" datetime="2023-01-21 21:53:44">
+                                {{i.time_create|naturaltime}}
+                            </time>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+            <div class="question__answers-count ">
+                <a class="mini-counter" href=""
+                   title="Количество ответов на вопрос" role="lazy_anchor">
+                    <div class="mini-counter__count mini-counter__count_grey">
+                        {{i.answer_set.count}}
+                    </div>
+                    <div class="mini-counter__value">
+                        ответ
+                    </div>
+                </a>
+            </div>
+        </div>
+    </li>
     {% endfor %}
-<h1><a  href="{{i.get_absolute_url}}" class="q_name">{{i.q_name}}</a></h1>
-<h4 class="question_author">Автор вопроса: {{i.author}}</h4>
-</div>
-{% endfor %}
 
-
-
-{%if page_obj.has_other_pages%}
-<nav class="list-pages">
-	<ul>
-		{%for p in page_obj.paginator.page_range%}
-		{% if page_obj.number == p %}
-        <li class="page-num page-num-selected">{{ p }}</li>
-		{% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2  %}
-        <li class="page-num">
-            <a href="?page={{ p }}">{{ p }}</a>
-        </li>
-		{% endif %}
-		{%endfor%}
-	</ul>
-</nav>
-	{%endif%}
+<!---->
+    {%if page_obj.has_other_pages%}
+    <nav class="list-pages">
+        <ul>
+            {%for p in page_obj.paginator.page_range%}
+            {% if page_obj.number == p %}
+            <li class="page-num page-num-selected">{{ p }}</li>
+            {% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
+            <li class="page-num">
+                <a href="?page={{ p }}">{{ p }}</a>
+            </li>
+            {% endif %}
+            {%endfor%}
+        </ul>
+    </nav>
+    {%endif%}
 
 </td>
 

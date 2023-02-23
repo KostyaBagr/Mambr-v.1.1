@@ -27,9 +27,15 @@
 					<h6 class="user-email">{{show_user.email}}</h6>
 				</div>
 				<div class="inforamation">
+					<div>
 					<p>Вопросы</p>
+					<p>{{show_user.questions_set.count}}</p>
+					</div>
+					<div>
 					<p>Ответы</p>
-					{{show_user.answer.count}}
+					<p>{{show_user.answer_set.count}}</p>
+					</div>
+
 				</div>
 				<hr>
 				<div class="about">

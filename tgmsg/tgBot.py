@@ -9,7 +9,8 @@ def sendTg(question_name,link):
         api = 'https://api.telegram.org/bot'
         method = api + token + '/sendMessage'
 
-        # print('имя вопроса',question_name)
+        print('имя вопроса',question_name)
+        print(link)
 
         if text.find('{') and text.find('}') and text.rfind('{') and text.rfind('}'):
                 part_1 = text[0:text.find('{')]
@@ -23,8 +24,8 @@ def sendTg(question_name,link):
             "text": text_slize,
 
         })
-        # print(text_slize)
-        # print(r.text)
+        print(text_slize)
+        print(r.text)
         if r.status_code != 200:
             raise Exception("post_text error")
 

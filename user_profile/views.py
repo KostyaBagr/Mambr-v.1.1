@@ -1,21 +1,24 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.tokens import default_token_generator
 
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordContextMixin
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import ListView, TemplateView
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect
+from django.views.generic import ListView, TemplateView, FormView
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
-from django.views.generic.edit import FormMixin, UpdateView
-# from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditForm
+
 from user_profile.forms import *
 # Create your views here.
 from user_profile.models import *
 from django.contrib.auth.views import LogoutView
-from user_profile.decorators import  allowed_users
+
 
 def success_login(request):
     dict = {
@@ -39,6 +42,7 @@ class MyLoginView(LoginView):
     template_name = 'user_profile/login.html'
     form_class = LoginForm
     success_url = reverse_lazy('success_login')
+    context_object_name ='form'
 
     def get_success_url(self):
         return self.success_url
@@ -50,42 +54,34 @@ class SignUpView(CreateView):
     form_class = CreateUserProfile
     success_url = reverse_lazy('home')
     template_name = 'user_profile/register_form.html'
-
-    def post(self, request, *args, **kwargs):
-        form = self.get_form(CreateUserProfile)
-        # form = CreateUserProfile(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.save()
-            return self.form_valid(form)
-        else:
-            return HttpResponse("Уберите пробел")
-
     def form_valid(self, form):
+
         form_valid = super().form_valid(form)
+
         username = form.cleaned_data["username"]
         email = form.cleaned_data['email']
         password = self.request.POST['password1']
-        # password2 = form.cleaned_data['password2']
-        aut_user = authenticate(username=username,password=password, email=email)
+
+        aut_user = authenticate(username=username, password=password, email=email)
         login(self.request, aut_user)
         return form_valid
+
 
 
 
 def update_profile(request):
     user = request.user
     form = CustomUserProfile(instance=user)
+    msg = False
     if request.method == 'POST':
-
         form = CustomUserProfile(request.POST,request.FILES, instance=user)
         form.save()
-        return redirect('profile')
-
-
-
+        # return redirect('profile')
+        msg =True
     dict = {
-        'form':form
+        'msg':msg,
+        'form':form,
+        'title': "Редактирование профиля"
     }
     return render(request, 'user_profile/user_settings.html', dict)
 
@@ -121,3 +117,4 @@ class ProfilePage(ListView):
 #
 class MyLogoutView(LogoutView):
     next_page = reverse_lazy('home')
+
