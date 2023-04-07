@@ -56,9 +56,9 @@
                             {% if request.user.is_authenticated %}
                             <li><a href="{% url 'profile' %}">Профиль</a></li>
                             <li><a href="{% url 'update_profile' %}">Настройки</a></li>
-                            {% if user.noti_from_user.count %}
+                            {% if user.noti_to_user.count %}
 
-                              <span class="badge">{{user.noti_from_user.count}}</span>
+                              <span class="badge">{{user.noti_to_user.count}}</span>
                             {%endif%}
                             <li><a href="{% url 'show-notifications' %}">Уведомления</a></li>
 

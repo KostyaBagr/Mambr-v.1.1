@@ -144,12 +144,10 @@
 
     <form action="." method="post" id="formReview">
         {% csrf_token %}
-        {{form.media}}
+        <p><textarea id='contactcomment' rows="5" cols="45" name="text"></textarea></p>
         <input type="hidden" name="parent" id="contactparent" value="">
 
-        <div id="contactcomment" >
-            <p>{{form.as_p}}</p>
-        </div>
+
 
          <p><input type="submit" value="Добавить ответ"></p>
     </form>
@@ -218,7 +216,27 @@
                                 </a>
                             </li>
                             </ul>
+
                             {%if request.user == more_q.author%}
+
+
+                            <form  action="{% url 'is_decided' i.id%}" method="post">
+                            {% csrf_token %}
+                            {% if request.user not in i.is_decided.all %}
+                                <button class="btn btn-success" type="submit" name="answer_id" value="{{i.id}} ">Пометить как решение</button>
+                                {{i.is_decided.count}}
+                            {%else%}
+                                <button class="btn btn-danger" type="submit" name="answer_id" value="{{i.id}} ">Отменить решение </button>
+                                {{i.is_decided.count}}
+                            {% endif %}
+                            </form>
+
+
+                            {% if request.user != more_q.author%}
+
+                            <h1>Ответ явялется полезным</h1>
+
+                            {%endif%}
                             <form  id="delete_form2{{i.id}}" action="{% url 'delete_comment' i.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
                         <a href="javascript:void()" onclick="delete_question2{{i.id}}()"><button type='submit' id="delete_button2" class="btn btn-light">Удалить</button>
                             </form>

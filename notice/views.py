@@ -1,23 +1,17 @@
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.template import loader
-from user_profile.models import *
-from notice.models import Notification
-# Create your views here.
-from django.contrib.auth.decorators import permission_required
 
+from django.shortcuts import render, redirect, get_object_or_404
+
+from blog.models import Questions
 from notice.models import Notification
 def ShowNotifications(request):
-    if Notification.sender == Notification.user:
-        print('Получатель является автором')
-    else:
-        print('Получатель не является от автором')
-        user = request.user
-        notifications = Notification.objects.filter(user=user).order_by('-date')
-        Notification.objects.filter(user=user, is_seen=False).update(is_seen=True)
-        dict = {
-            'notifications': notifications
-        }
+    user = request.user
+    notifications = Notification.objects.filter(user=user).order_by('-date')
+    Notification.objects.filter(user=user, is_seen=False).update(is_seen=True)
+    dict = {
+        'notifications': notifications
+    }
+
+
     return render(request, 'notice/notifications.html', dict)
 
 

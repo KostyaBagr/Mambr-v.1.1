@@ -8,7 +8,6 @@ from ckeditor_uploader.fields import RichTextUploadingField
 class Questions(models.Model):
     """Модель для формирования вопросов"""
 
-
     COMPLEXITY =[
         ('E', 'Легкий'),
         ('M', 'Средний'),
@@ -44,6 +43,7 @@ class Answer(models.Model):
     active = models.BooleanField(default=True)
     parent = models.ForeignKey('self', verbose_name="Родитель", on_delete=models.SET_NULL, blank=True, null=True)
     author = models.ForeignKey(MyUserProfile, on_delete=models.CASCADE,verbose_name='Автор комментария',default='')
+    is_decided = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='is_decided_question')
 
 
 

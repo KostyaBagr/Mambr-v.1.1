@@ -1,10 +1,10 @@
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
-
+from django.shortcuts import get_object_or_404, redirect, render
+from notice.tasks import send_email_after_answer
 from django.urls import reverse_lazy
-
+from django.http import HttpResponseForbidden
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, FormView, DeleteView, UpdateView, FormMixin
 from django.http import HttpResponse, JsonResponse, HttpResponseNotFound, HttpResponseRedirect
@@ -90,14 +90,12 @@ class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = context['more_q']
-
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         form = self.get_form()
         if form.is_valid():
-
             if request.POST.get("parent", None):
                 form.parent_id = int(request.POST.get("parent"))
                 parent_obj = Answer.objects.get(id=form.parent_id)
@@ -112,6 +110,7 @@ class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
         self.object = form.save(commit=False)
         self.object.post = self.get_object()
         self.object.author = self.request.user
+        # send_email_after_answer.delay()
         self.object.save()
         return super().form_valid(form)
 
@@ -194,6 +193,18 @@ class AddQuestion(SuccessMessageMixin,CreateView):
         self.object.author = self.request.user  # получаем текущего user
         self.object.save()  # сохраняем в бд
         return super().form_valid(form)
+
+
+def is_decided_question(request,q_pk):
+    post = get_object_or_404(Answer, id=request.POST.get('answer_id'))
+    if post.author == request.user:
+        return HttpResponseForbidden()
+    else:
+        if post.is_decided.filter(id=request.user.id).exists(): #кнопка отмены
+            post.is_decided.remove(request.user)
+        else:
+            post.is_decided.add(request.user) #кнопка добавления
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
 

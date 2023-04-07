@@ -13,4 +13,4 @@ class Notification(models.Model):
     notification_type = models.IntegerField(choices=NOTIFICATION_TYPES)
     text_preview = models.CharField(max_length=90, blank=True)
     date = models.DateTimeField(auto_now_add=True)
-    is_seen = models.BooleanField(default=False)
+    is_seen = models.BooleanField(default=True)
