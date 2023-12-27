@@ -18,10 +18,13 @@ from django.contrib import admin
 from django.urls import path,include
 from habr import settings
 from blog.views import *
-
+from django.contrib.auth.decorators import login_required
+from ckeditor_uploader.views import upload
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('blog.urls')),
+    path('ckeditor/upload/', login_required(upload), name='ckeditor_upload'),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
     path('', include('user_profile.urls')),
 ]
 urlpatterns+= static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -13,9 +13,9 @@ import os
 
 from pathlib import Path
 from django.urls import reverse_lazy
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -28,11 +28,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
     'user_profile.apps.UserProfileConfig',
+    'notice.apps.NoticeConfig',
     'blog.apps.BlogConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,7 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tgmsg.apps.TgmsgConfig',
-    'taggit'
+    'django.contrib.humanize',
+    'ckeditor',
+    'ckeditor_uploader',
+    'taggit',
+
+
 ]
 
 MIDDLEWARE = [
@@ -52,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'habr.urls'
@@ -74,7 +80,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'habr.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -84,31 +89,60 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    # {
-    #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    # },
-    # {
-    #     'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    # },
-    # {
-    #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    # },
-    # {
-    #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    # },
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
+CKEDITOR_CONFIGS = {
+    'default': {
+            "removePlugins": "stylesheetparser",
 
+        'toolbar_Basic': [
+            ['Source', '-', 'Bold', 'Italic', ]
+        ],
+        'toolbar_YourCustomToolbarConfig': [
+            {'name': 'document', 'items': ['Preview']},
+
+            {'name': 'basicstyles',
+             'items': ['Bold', 'Italic', 'Underline', 'Strike','CodeSnippet']},
+            {'name': 'links', 'items': ['Link']},
+            {'name': 'insert',
+             'items': ['Image',  'HorizontalRule', 'Smiley', ]},
+            {'name': 'clipboard', 'items': [ 'Undo', 'Redo']},
+
+            {'name': 'yourcustomtools', 'items': [
+                # put the name of your editor.ui.addButton here
+            ]},
+        ],
+        'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
+
+        'tabSpaces': 4,
+        'extraPlugins': ','.join([
+            'uploadimage', # the upload image feature
+            # your extra plugins here
+            'codesnippet',
+            # 'devtools',
+
+        ]),
+    }
+}
 
 LANGUAGE_CODE = 'ru'
 
@@ -120,7 +154,7 @@ USE_TZ = True
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'name'
 
-AUTH_USER_MODEL ='user_profile.MyUserProfile'
+AUTH_USER_MODEL = 'user_profile.MyUserProfile'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
@@ -131,9 +165,23 @@ STATICFILES_DIRS = []
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+CKEDITOR_UPLOAD_PATH = "uploads/"
 
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'mambr.community@gmail.com'
+EMAIL_HOST_PASSWORD = 'nreqievhfbnwmjjx'
+
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = '6379'
+CELERY_BROKER_URL = 'redis://' + REDIS_HOST + ":" + REDIS_PORT + '/0'
+CELERY_BROKER_TRANSPORT_OPTIONS = {"visibility_timeout" : 3600}
+CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ":" + REDIS_PORT + '/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'

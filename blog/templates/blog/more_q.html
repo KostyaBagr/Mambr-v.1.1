@@ -1,145 +1,393 @@
 {% extends 'blog/base.html' %}
-{% block content %}
+{% load humanize %}
 {%load static %}
+{% block content %}
+
+
 <td valign="top" class="content">
 
-
-<!--    Так выглядит вопрос(запись)-->
-    <div class="square">
-        <h3>{{more_q.author}}</h3>
-        <h5 class="category">Категория: {{more_q.q_cat}}</h5>
-        <h1 class="q_name">{{more_q.q_name}}</h1>
-<!--        {% autoescape off %}-->
-        <p class="q_text">{{more_q.q_text}}</p>
-<!--        {% endautoescape %}-->
+    {% if messages%}
+    {% for m in messages %}
+    <div class="alert alert-success" role="alert">
+        <div>
+            {{m}}
+        </div>
     </div>
-
-
-    {% if request.user == more_q.author %}
-    <button class="edit_btn"><a class="edit_text" href="{% url 'edit' more_q.pk %}">Редактировать</a></button>
-
-    <form method="post" action="{% url 'delete' more_q.pk %}">{% csrf_token %}
-<!--    <p>Are you sure you want to delete "{{ object }}"?</p>-->
-    {{ delete_form }}
-    <input type="submit" value="Удалить">
-    </form>
-    {% else %}
-
+    {% endfor%}
     {% endif%}
 
+{% if more_q.msg %}
+<div class="alert alert-success" role="alert">
+    <div>
+Жалоба отправлена
+    </div>
+</div>
+
+{% endif%}
+
+    <!--    Так выглядит вопрос(запись)-->
+
+    <div class="question question_full">
+        <div class="question-head">
+            <div class="user-summary user-summary_question" itemprop="author creator" itemscope="" itemtype="">
+
+                    {% if user.photo %}
+                        <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15"
+                             src="{{more_q.author.photo.url}}" alt="Image Description">
+                        {%else%}
+                        <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15"
+                             src="{% static 'blog/img/regular_user.jpg'%}" alt="Image Description">
+                        {%endif%}
+                <div id='question_author_name' class="user-summary__desc">
+                    <a class="user-summary__name" href="{% url 'show_other_profiles' more_q.author.id  %}" itemprop="url">
+                        <meta itemprop="name" content="">
+                        {{more_q.author}}</a>
+                    <span class="user-summary__nickname">
+
+                </div>
+            </div>
+        </div>
+        <div class="question__tags">
+
+            {% for tag in more_q.tags.all %}
+            <ul class="tags-list">
+
+                <li class="tags-list__item subscribed tag_340" data-tagname="python">
+                    <a href="{% url 'taggit' tag.slug %}">
+
+                        {{ tag.name }}
+                        {% if not forloop.last %}, {% endif %}
+                    </a>
+            </ul>
+            {% endfor %}
+        </div>
+        <h1 class="question__title" itemprop="name ">
+            {{more_q.q_name}}</h1>
+        <div class="question__body">
+            {% autoescape off %}
+            <div class="question__text js-question-text" itemprop="text description">
+                {{more_q.q_text | safe}}
+            </div>
+            {% endautoescape %}
+            <ul class="question__attrs inline-list">
+                <li class="inline-list__item inline-list__item_bullet">
+        <span class="question__pub-date">
+          Вопрос задан
+          <time pubdate="" itemprop="dateCreated" datetime="2023-01-22 12:07:57"
+                >
+             {{ more_q.time_create|naturaltime }}        </time><span class="difficult">{{more_q.get_difficult_display}}</span>
+                  </span>
+
+                </li>
+
+            </ul>
+        </div>
+
+
+        </div>
+        {% if request.user == more_q.author %}
+    <div class="work-title-category-item">
+      <ul>
+        <span class="other_li">
+
+
+        <a href="{% url 'edit' more_q.pk %}"><button type="submit" id="edit_button" class="btn btn-light">Редактировать</button></a>
+
+
+            <form id="delete_form{{more_q.id}}" action="{% url 'delete' more_q.pk %}" method="post">{% csrf_token %}{{ delete_form }}</form>
+            <a href="javascript:void()" onclick="delete_question{{more_q.id}}()"><button type='submit' id="delete_button" class="btn btn-light">Удалить</button></a><br>
+
+          <script>
+              function delete_question{{more_q.id}}() {
+                  if (confirm("Вы уверены")) {
+                      document.getElementById('delete_form{{more_q.id}}').submit()
+                  }
+              }
+              </script>
+
+                  </span>
+        <li class="local-cat">...</li>
+      </ul>
+    </div>
+  </div>
+    {% else %}
+    <div class="work-title-category-item">
+      <ul>
+        <span class="other_li">
     <form method="post" action="{% url 'send_msg' more_q.pk%}">{% csrf_token %}
     {{ telegram_form }}
 
-    <input type="submit" value="Отпрвавить жалобу">
+    <button type="submit" class="btn btn-light">Отправить жалобу</button>
     </form>
+           </span>
+        <li class="local-cat">...</li>
+      </ul>
+    </div>
+
+    {% endif%}
 
 <hr>
+        <!--Подсчет кол-ва ответов на вопрос-->
 
-<!--Подсчет кол-ва ответов на вопрос-->
-    <h4>
-        Ответы - {{more_q.comments.count}}
-    </h4>
-<!--  форма для заполнения ответов -->
+        <!--  форма для заполнения ответов -->
 
-    {% if new_message %}
-    <h3>Ваш ответ был добавлен</h3>
-    {% endif %}
+        {% if success_msg %}
+        <div class="alert alert-success" role="alert">
+    Ваш ответ был добавлен
+        </div>
 
-    <h2>Добавьте ваш ответ</h2>
-    {% if user.is_authenticated%}
+        {% endif %}
+
+        <strong class="section-header__title">
+    Ваш ответ на вопрос      </strong>
+        {% if user.is_authenticated%}
+
     <form action="." method="post" id="formReview">
         {% csrf_token %}
-        <input type="hidden" name="parent" id="contactparent" value="">
         <p><textarea id='contactcomment' rows="5" cols="45" name="text"></textarea></p>
+        <input type="hidden" name="parent" id="contactparent" value="">
+
+
+
          <p><input type="submit" value="Добавить ответ"></p>
     </form>
 
-<div id="text_test">
+ <script type="text/javascript">
+    "use strict";
 
-<button  type="button" onclick="insert(' <pre><code>Тут код</code></pre> ')">Вставить код</button>
+    let prev = null;
+    document.body.addEventListener("click", (e) => {
+      let el = e.target;
+      if (!el.classList.contains("local-cat")) return false;
+      let other = el.parentElement.querySelector(".other_li");
+      if (prev === other) {
+        other.style.display = "none";
+        prev = null;
+        return false;
+      }
 
-</div>
+      if (prev) prev.style.display = "none";
+      other.style.display = "block";
+      prev = el.parentElement.querySelector(".other_li");
 
-<script>
-    function insert (word) {
-  let inp = document.querySelector('#contactcomment');
-  let start = inp.selectionStart;
-  inp.value = inp.value.substring(0, start) + word +
-    inp.value.substring(inp.selectionEnd, inp.value.length)
-    inp.focus();
-    inp.setSelectionRange(start, start + word.length)
-}
+    });
+  </script>
+        {% else %}
+        <h2>Зарегистрируйтесь, чтобы оставить комментарий </h2>
 
-</script>
+        {% endif %}
+        <hr>
+<strong class="section-header__title">
+        Решения вопроса          <span class="section-header__counter" role="answers_counter">({{more_q.answer_set.count}})</span>
+          </strong>
+        {% for i in more_q.get_answer%}
+        <!---->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+              integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+              crossorigin="anonymous">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="media g-mb-30 media-comment">
+                        {% if user.photo %}
+                        <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15"
+                             src="{{i.author.photo.url}}" alt="Image Description">
+                        {%else%}
+                        <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15"
+                             src="{% static 'blog/img/regular_user.jpg'%}" alt="Image Description">
+                        {%endif%}
+                        <div class="media-body u-shadow-v18 g-bg-secondary g-pa-30">
+                            <div class="g-mb-15">
 
-    {% else %}
-    <h2>Зарегистрируйтесь, чтобы оставить комментарий </h2>
-
-{% endif %}
-    <hr>
-
-{% for i in more_q.comments.all%}
+                                <h5 class="h5 g-color-gray-dark-v1 mb-0"><a
+                                        href="{% url 'show_other_profiles' i.author.id  %}">{{i.author}}</a></h5>
+                                <span class="g-color-gray-dark-v4 g-font-size-12">{{ i.created|naturaltime }}</span>
+                            </div>
 
 
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-<div class="container">
-<div class="row">
-    <div class="col-md-8">
-        <div class="media g-mb-30 media-comment">
-            {% if user.photo %}
-            <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15" src="{{i.author.photo.url}}" alt="Image Description">
-            {%else%}
-            <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15" src="{% static 'blog/img/regular_user.jpg'%}" alt="Image Description">
-            {%endif%}
-            <div class="media-body u-shadow-v18 g-bg-secondary g-pa-30">
-              <div class="g-mb-15">
-                <h5 class="h5 g-color-gray-dark-v1 mb-0"><a href="{% url 'show_other_profiles' i.author.id  %}">{{i.author}}</a></h5>
-                <span class="g-color-gray-dark-v4 g-font-size-12">{{ i.created|date:"d.m.Y" }}</span>
-              </div>
+                            <p>{{ i.text|safe }}</p>
 
-              <p>{{ i.text }}</p>
 
-                <li class="list-inline-item ml-auto">
-                  <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#formReview"   onclick="addReview('{{i.author}}', '{{i.id}}')">
-                    <i class='fa fa-reply g-pos-rel g-top-1 g-mr-3'></i>
-                    Reply
-                  </a>
-                </li>
-              </ul>
+                            <li class="list-inline-item ml-auto">
+                                <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover" href="#formReview"
+                                   onclick="addReview('{{i.author}}', '{{i.id}}')">
+                                    <i class='fa fa-reply g-pos-rel g-top-1 g-mr-3'></i>
+                                    Reply
+                                </a>
+                            </li>
+                            </ul>
+
+                            {%if request.user == more_q.author%}
+
+
+                            <form  action="{% url 'is_decided' i.id%}" method="post">
+                            {% csrf_token %}
+                            {% if request.user not in i.is_decided.all %}
+                                <button class="btn btn-success" type="submit" name="answer_id" value="{{i.id}} ">Пометить как решение</button>
+                                {{i.is_decided.count}}
+                            {%else%}
+                                <button class="btn btn-danger" type="submit" name="answer_id" value="{{i.id}} ">Отменить решение </button>
+                                {{i.is_decided.count}}
+                            {% endif %}
+                            </form>
+
+
+                            {% if request.user != more_q.author%}
+
+                            <h1>Ответ явялется полезным</h1>
+
+                            {%endif%}
+                            <form  id="delete_form2{{i.id}}" action="{% url 'delete_comment' i.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
+                        <a href="javascript:void()" onclick="delete_question2{{i.id}}()"><button type='submit' id="delete_button2" class="btn btn-light">Удалить</button>
+                            </form>
+
+                    <script>
+                      function delete_question2{{i.id}}() {
+                          if (confirm("Вы уверены")) {
+                              document.getElementById('delete_form2{{i.id}}').submit()
+                          }
+                      }
+                      </script>
+                            {%endif%}
+                        </div>
+
+                    </div>
+                </div>
+
+                {% for x in i.answer_set.all %}
+
+
+                <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+                      rel="stylesheet"
+                      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+                      crossorigin="anonymous">
+                <div class="container">
+                    <div class="row">
+                        <div id='text_answer' class="col-md-7">
+
+                            <div class="media g-mb-30 media-comment">
+
+                                {% if user.photo %}
+                                <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15"
+                                     src="{{x.author.photo.url}}" alt="Image Description">
+                                {%else%}
+                                <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15"
+                                     src="{% static 'blog/img/regular_user.jpg'%}" alt="Image Description">
+                                {%endif%}
+                                <div class="media-body u-shadow-v18 g-bg-secondary g-pa-30">
+                                    <div class="g-mb-15">
+
+                                        <h5 class="h5 g-color-gray-dark-v1 mb-0"><a
+                                                href="{% url 'show_other_profiles' x.author.id  %}">{{x.author}}</a>
+                                        </h5>
+                                        <span class="g-color-gray-dark-v4 g-font-size-12">{{ x.created|date:"d.m.Y" }}</span>
+                                    </div>
+                                    <p>{{ x.text|safe }}</p>
+
+                                    <li class="list-inline-item ml-auto">
+                                        <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover"
+                                           href="#formReview" onclick="addReview('{{x.author}}', '{{x.id}}')">
+                                            <i class='fa fa-reply g-pos-rel g-top-1 g-mr-3'></i>
+                                            Reply
+                                        </a>
+                                    </li>
+                                    </ul>
+                                    {%if request.user == more_q.author%}
+                                    <form  id="delete_form3{{x.id}}" action="{% url 'delete_comment' x.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
+                        <a href="javascript:void()" onclick="delete_question3{{x.id}}()"><button type='submit' id="delete_button3" class="btn btn-light">Удалить</button>
+                                    </form>
+
+                    <script>
+                      function delete_question3{{x.id}}() {
+                          if (confirm("Вы уверены")) {
+                              document.getElementById('delete_form3{{x.id}}').submit()
+                          }
+                      }
+                      </script>
+                                    {%endif%}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+                {% for r in x.answer_set.all %}
+
+
+                <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+                      rel="stylesheet"
+                      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+                      crossorigin="anonymous">
+                <div class="container">
+                    <div class="row">
+                        <div id='text_answer_answer' class="col-md-7">
+
+                            <div class="media g-mb-30 media-comment">
+
+                                {% if user.photo %}
+                                <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15"
+                                     src="{{r.author.photo.url}}" alt="Image Description">
+                                {%else%}
+                                <img class="d-flex g-width-50 g-height-50 rounded-circle g-mt-3 g-mr-15"
+                                     src="{% static 'blog/img/regular_user.jpg'%}" alt="Image Description">
+                                {%endif%}
+                                <div class="media-body u-shadow-v18 g-bg-secondary g-pa-30">
+                                    <div class="g-mb-15">
+
+                                        <h5 class="h5 g-color-gray-dark-v1 mb-0"><a
+                                                href="{% url 'show_other_profiles' r.author.id  %}">{{r.author}}</a>
+                                        </h5>
+                                        <span class="g-color-gray-dark-v4 g-font-size-12">{{ r.created|date:"d.m.Y" }}</span>
+                                    </div>
+                                    <p>{{ r.text|safe }}</p>
+
+                                    <li class="list-inline-item ml-auto">
+                                        <a class="u-link-v5 g-color-gray-dark-v4 g-color-primary--hover"
+                                           href="#formReview" onclick="addReview('{{x.author}}', '{{x.id}}')">
+                                            <i class='fa fa-reply g-pos-rel g-top-1 g-mr-3'></i>
+                                            Reply
+                                        </a>
+                                    </li>
+                                    </ul>
+                                    {%if request.user == more_q.author%}
+                                    <form  id="delete_form4{{r.id}}" action="{% url 'delete_comment' r.id  %}" method="post">{% csrf_token %}{{ answer_delete_form }}
+                                <a href="javascript:void()" onclick="delete_question4{{r.id}}()"><button type='submit' id="delete_button4" class="btn btn-light">Удалить</button>
+                                    </form>
+
+                    <script>
+                      function delete_question4{{r.id}}() {
+                          if (confirm("Вы уверены")) {
+                              document.getElementById('delete_form4{{r.id}}').submit()
+                          }
+                      }
+                      </script>
+                                    {%endif%}
+
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                {% endfor %}
+                {% endfor %}
+                {% endfor %}
             </div>
         </div>
-    </div>
-
-
-
-    <hr>
-
-{%endfor%}
-
-<!--Отображаение всех ответов-->
-
-
-<!--    {% for ans in answer %}-->
-<!--    <p class="user_name_answer">{{user.username}}</p>-->
-<!--    <div class="answer">-->
-<!--        <p class="answer_text">-->
-<!--        {{ ans.text }}-->
-<!--        </p>-->
-<!--        {{ ans.created|date:"d.m.Y" }}-->
-<!--    </div>-->
-<hr>
-    {% empty %}
-        <p>Будьте первым, написавшим ответ!</p>
-    {% endfor %}
-
-</div>
-</div>
 </td>
 <script>
-function addReview(name, id){
+function addReview(author, id){
     document.getElementById('contactparent').value = id;
-    document.getElementById('contactcomment').innerText = '${name}, '
+    document.getElementById('contactcomment').innerText = `${author}, `
 
 }
+
 </script>
 {% endblock %}

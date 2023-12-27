@@ -1,28 +1,22 @@
-from _ast import operator
-from functools import reduce
 
-from django.contrib.admin.templatetags.admin_list import results
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
+from notice.tasks import send_email_after_answer
 from django.urls import reverse_lazy
+from django.http import HttpResponseForbidden
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, FormView, DeleteView, UpdateView, FormMixin
-from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
-# Create your views here.
-from django.contrib.auth import authenticate
-from taggit.views import TagListMixin
+from django.http import HttpResponse, JsonResponse, HttpResponseNotFound, HttpResponseRedirect
 
-from user_profile.forms import CustomUserProfile
-from .models import *
 from taggit.models import Tag
 from .utils import *
-from django.db.models import Q, F
-from django.http import Http404, HttpResponseRedirect
+from django.db.models import Q
+
 from .forms import *
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 
 class TagMixin(object):
@@ -51,8 +45,9 @@ class MainListVIew(TagMixin, DataMixin, ListView):
     def get_queryset(self, *, object_list=None, **kwargs):
         q = self.request.GET.get("search", '')
 
-        object_list = Questions.objects.filter(Q(q_name__icontains=q))
+        object_list = Questions.objects.filter(Q(q_name__iregex=q))
         return object_list.filter(is_published=True).order_by('-time_create')
+
 
 
 class TagListView(TagMixin, ListView):
@@ -88,8 +83,6 @@ class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
     context_object_name = 'more_q'
     form_class = AnswerForm
     success_url = reverse_lazy('question')
-    success_msg = 'Запись успешно обновлена'
-
 
     def get_success_url(self):
         return reverse_lazy('question', kwargs={'q_pk':self.get_object().id})
@@ -103,14 +96,21 @@ class MoreDetailsQuestion(SuccessMessageMixin, FormMixin, DetailView):
         self.object = self.get_object()
         form = self.get_form()
         if form.is_valid():
+            if request.POST.get("parent", None):
+                form.parent_id = int(request.POST.get("parent"))
+                parent_obj = Answer.objects.get(id=form.parent_id)
+                replay_comment = form.save(commit=False)
+                replay_comment.parent = parent_obj
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
+
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.post = self.get_object()
         self.object.author = self.request.user
+        # send_email_after_answer.delay()
         self.object.save()
         return super().form_valid(form)
 
@@ -120,40 +120,17 @@ class QuestionDeleteView(LoginRequiredMixin, DeleteView):
     model = Questions
     context_object_name = 'delete_form'
     success_url = reverse_lazy('home')
-    success_msg = 'Все ок'
+    success_msg = 'Вопрос успешно удалён'
+    pk_url_kwarg = "q_pk"
 
-    def post(self, request, *args, **kwargs):
-        messages.success(self.request, self.success_msg)
-        return super().post(request)
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.request.user != self.object.author:
-            return self.handle_no_permission()
-        success_url = self.get_success_url()
-        self.object.delete()
-        return HttpResponseRedirect(success_url)
+    def get_queryset(self):
+        user = self.request.user
+        return super().get_queryset().filter(author=user)
 
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1>Страница не найдена</h1>')
 
-class AnswerDeleteView(LoginRequiredMixin, DeleteView):
-    model = Answer
-    context_object_name = 'ans_delete_form'
-    success_url = reverse_lazy('home')
-    success_msg = 'Все ок'
 
-    def post(self, request, *args, **kwargs):
-        messages.success(self.request, self.success_msg)
-        return super().post(request)
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.request.user != self.object.author:
-            return self.handle_no_permission()
-        success_url = self.get_success_url()
-        self.object.delete()
-        return HttpResponseRedirect(success_url)
 
 
 class UpdateQuestionView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
@@ -162,8 +139,12 @@ class UpdateQuestionView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     form_class = QuestionForm
     success_url = reverse_lazy('home')
     context_object_name = 'form'
-    success_msg = 'Запись успешно обновлена'
+    success_msg = 'Вопрос успешно обновлен'
+    pk_url_kwarg = "q_pk"
 
+
+    def get_success_url(self):
+        return reverse_lazy('question', kwargs={'q_pk':self.get_object().id})
     def get_context_data(self, **kwargs):
         kwargs['update_button'] = True
         return super().get_context_data(**kwargs)
@@ -176,17 +157,58 @@ class UpdateQuestionView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return kwargs
 
 
+class DeleteAnswer(DeleteView):
+    model = Answer
+    template_name = 'blog/more_q.html'
+    context_object_name = 'answer_delete_form'
+    pk_url_kwarg = 'id'
 
-class AddQuestion(SuccessMessageMixin, CreateView):
+    def get_success_url(self):
+        return reverse('question', kwargs={'q_pk':  self.object.post_id})
+
+    def get_queryset(self):
+        user = self.request.user
+        return super().get_queryset().filter(author=user)
+
+
+
+
+class AddQuestion(SuccessMessageMixin,CreateView):
     model = Questions
     template_name = 'blog/add_question.html'
     form_class = QuestionForm
-    success_msg = 'Запись успешно добавлена'
+    success_msg = 'Вопрос упешно добавлен'
     success_url = reverse_lazy('home')
     context_object_name = 'form'
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Задать вопрос"
+        return context
+    def get_success_url(self):
+        return reverse('question', args=(self.object.id,))
 
     def form_valid(self, form):
+
         self.object = form.save(commit=False)  # создаем экземпляр
         self.object.author = self.request.user  # получаем текущего user
         self.object.save()  # сохраняем в бд
         return super().form_valid(form)
+
+
+def is_decided_question(request,q_pk):
+    post = get_object_or_404(Answer, id=request.POST.get('answer_id'))
+    if post.author == request.user:
+        return HttpResponseForbidden()
+    else:
+        if post.is_decided.filter(id=request.user.id).exists(): #кнопка отмены
+            post.is_decided.remove(request.user)
+        else:
+            post.is_decided.add(request.user) #кнопка добавления
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+
+
+
+
+

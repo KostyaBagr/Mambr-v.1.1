@@ -7,9 +7,6 @@ class LoginForm(AuthenticationForm,forms.ModelForm):
     class Meta:
         model = MyUserProfile
         fields = ('username',)
-    # username = forms.CharField()
-    # password1 = forms.CharField(widget=forms.PasswordInput)
-    # password2 = forms.CharField(widget=forms.PasswordInput)
 
 
 class CreateUserProfile(UserCreationForm):
@@ -20,10 +17,7 @@ class CreateUserProfile(UserCreationForm):
         labels= {'username':'Ваше имя'}
 
 
-        # widgets = {
-        #     'password1': forms.TextInput(attrs={'': 'form-control'}),
-        #
-        # }
+
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -37,4 +31,4 @@ class CustomUserProfile(UserChangeForm):
     class Meta:
         model = MyUserProfile
         fields =('username', 'email', 'bio', 'photo')
-        exclude = ['password']
+

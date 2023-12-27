@@ -1,0 +1,8 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+<td valign="top" class="content">
+    {%for i in preview%}
+    {{i.q_name}}
+    {%endfor%}
+</td>
+{%endblock%}

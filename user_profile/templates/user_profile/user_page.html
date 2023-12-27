@@ -3,18 +3,12 @@
 {% block content %}
 
 <td valign="top" class="content">
-
-
-
-
 <div class="main_body">
 	<div class="n_body">
 		<div class="card-body">
 			<div class="account-settings">
 				<div class="user-profile">
 					<div class="user-avatar">
-
-
 				{% if user.photo %}
 								<div class="card-header py-3">
 									<img class='img-thumbnail' src="{{request.user.photo.url}}" alt="1" width="350px" height="500px">
@@ -30,9 +24,15 @@
 					<h6 class="user-email">{{user.email}}</h6>
 				</div>
 				<div class="inforamation">
+					<div>
 					<p>Вопросы</p>
+					<p>{{user.questions_set.count}}</p>
+					</div>
+					<div>
 					<p>Ответы</p>
-					{{user.answer.count}}
+					<p>{{user.answer_set.count}}</p>
+					</div>
+
 				</div>
 				<hr>
 				<div class="about">
@@ -42,6 +42,6 @@
 			</div>
 		</div>
 	</div>
-
+</div>
 </td>
 {% endblock %}
